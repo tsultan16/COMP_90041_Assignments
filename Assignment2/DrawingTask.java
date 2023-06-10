@@ -4,7 +4,6 @@ import java.util.Scanner;
  * A class for managing the two different drawing task modes: challenge and freestyle
  *
  * @author: Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class DrawingTask {
 

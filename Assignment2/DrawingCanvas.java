@@ -6,7 +6,6 @@ import java.util.Scanner;
  * A class for manipulating a drawing canvas
  *
  * @author: Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class DrawingCanvas {
 

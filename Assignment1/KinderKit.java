@@ -1,7 +1,6 @@
 /**
  * COMP90041, Sem1, 2023: Assignment 1
  * @author: Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
  
  import java.util.Scanner;

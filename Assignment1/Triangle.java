@@ -4,7 +4,6 @@ import java.util.Scanner;
  * A class for drawing triangles on a drawing canvas
  *
  * @author: Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 
 public class Triangle {

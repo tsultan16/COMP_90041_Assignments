@@ -2,7 +2,6 @@
  * A class for manipulating triangles that can be put on a drawing canvas
  *
  * @author: Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Triangle {
 
