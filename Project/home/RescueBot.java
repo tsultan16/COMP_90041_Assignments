@@ -9,17 +9,20 @@ import java.lang.Math;
 import java.util.Scanner;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class RescueBot {
 
     private String logFile;
     private String scenarioFile;
     private Scanner kb;
-    
+    private ArrayList<Scenario> scenarios;
+
     public RescueBot() {
         this.logFile = "";
         this.scenarioFile = "";
         this.kb = new Scanner(System.in);
+        this.scenarios = null;
     }
 
     /**
@@ -86,33 +89,29 @@ public class RescueBot {
         boolean sSet = false;
         boolean hasLogPath = false;
         boolean hasScenarioPath = false; 
-        boolean showHelp = false;
+        boolean showHelp = true;
 
         if(args.length == 0){
             return true;
         } 
 
-        if((args[0].equals("--help")) || (args[0].equals("-h"))) {
-            showHelp = true;
-        } else { 
-            for (int i = 0; i < args.length; i++) {
-                if((args[i].equals("--log")) || (args[i].equals("-l"))) {
-                    lSet = true;
-                    if(((i+1) < args.length) && (this.isValidFileName(args[i+1], "log"))) {
-                        hasLogPath = true;
-                        this.logFile = args[i+1];    
-                    }
-                } else if((args[i].equals("--scenario")) || (args[i].equals("-s"))) {
-                    sSet = true;
-                    if(((i+1) < args.length) && (this.isValidFileName(args[i+1], "csv"))) {
-                        hasScenarioPath = true;
-                        this.scenarioFile = args[i+1];    
-                    }
+        for (int i = 0; i < args.length; i++) {
+            if((args[i].equals("--log")) || (args[i].equals("-l"))) {
+                lSet = true;
+                if(((i+1) < args.length) && (this.isValidFileName(args[i+1], "log"))) {
+                    hasLogPath = true;
+                    this.logFile = args[i+1];    
+                }
+            } else if((args[i].equals("--scenarios")) || (args[i].equals("-s"))) {
+                sSet = true;
+                if(((i+1) < args.length) && (this.isValidFileName(args[i+1], "csv"))) {
+                    hasScenarioPath = true;
+                    this.scenarioFile = args[i+1];    
                 }
             }
-            if(((!hasLogPath) && lSet) || ((!hasScenarioPath) && sSet)) {
-                showHelp = true;
-            }
+        }
+        if((hasLogPath && lSet && (!sSet)) || (hasScenarioPath && sSet && (!lSet)) || (((hasScenarioPath && sSet) && (hasLogPath && lSet)))) {
+            showHelp = false;
         }
 
         return showHelp;    
@@ -167,6 +166,12 @@ public class RescueBot {
 
         // display welcome message to screen
         rb.welcomeMsg();
+
+        // import scenarios file (if option provided)
+        if(!rb.scenarioFile.equals("")){
+            System.out.println("Importing scenarios file: " + rb.scenarioFile);
+            rb.scenarios = FileIO.importScenarios(rb.scenarioFile);
+        }
 
         // enter main menu loop
         rb.mainMenu();

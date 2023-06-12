@@ -12,15 +12,45 @@ public class Human extends Character {
         this.ageCategory = this.categorizeAge(this.getAge());
         if(!this.ageCategory.equals("adult")){
             // default profession for non-adults
-            this.profession = DEFAULT_PROFESSION;
+            try{
+                if(!profession.equals(DEFAULT_PROFESSION)) {
+                     throw new InvalidCharacteristicException("WARNING: invalid characteristic in scenarios file in line " + lineNum);
+                } else {            
+                    this.profession = profession;
+                }
+            } catch (InvalidCharacteristicException e) {
+                System.out.println(e.getMessage());
+                this.profession = DEFAULT_PROFESSION;
+            }
+
         } else {
             this.profession = this.validProfession(profession, lineNum);
         }
+        
         if (this.getGender().equals("male")) {
-            this.pregnant = false;
+            try {
+                if(pregnant.equals("true")) {
+                    throw new InvalidCharacteristicException("WARNING: invalid characteristic in scenarios file in line " + lineNum);
+                } else {
+                    this.pregnant = false;
+                }
+            } catch (InvalidCharacteristicException e) {
+                System.out.println(e.getMessage());
+                this.pregnant = false;
+            }
+
         } else {
             if(!this.ageCategory.equals("adult")){
-                this.pregnant = false;
+                try {
+                    if(pregnant.equals("true")) {
+                        throw new InvalidCharacteristicException("WARNING: invalid characteristic in scenarios file in line " + lineNum);
+                    } else {
+                        this.pregnant = false;
+                    }
+                } catch (InvalidCharacteristicException e) {
+                    System.out.println(e.getMessage());
+                    this.pregnant = false;
+                }
             } else {
                 // only adult females can be pregnant
                 this.pregnant = Boolean.parseBoolean(pregnant);
@@ -44,6 +74,7 @@ public class Human extends Character {
 
     private String validProfession(String pr, int lineNum) {
         String valid;
+        /*
         try{
             if((pr.equals("doctor")) || (pr.equals("ceo")) || (pr.equals("criminal")) || 
                (pr.equals("homeless")) || (pr.equals("unemployed")) || (pr.equals("none")) ) {
@@ -55,6 +86,14 @@ public class Human extends Character {
             System.out.println(e.getMessage());
             valid =  DEFAULT_PROFESSION;
         }
+        */
+        if((pr.equals("doctor")) || (pr.equals("ceo")) || (pr.equals("criminal")) || 
+            (pr.equals("homeless")) || (pr.equals("unemployed")) || (pr.equals("none")) ||
+            (pr.equals("student")) || (pr.equals("scientist"))) {
+            valid = pr;
+        } else {
+            valid =  DEFAULT_PROFESSION;
+        } 
         return valid;
     }
 

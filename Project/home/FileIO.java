@@ -13,7 +13,7 @@ public class FileIO {
 
     }
 
-    public ArrayList<Scenario> importScenarios (String filename) {
+    public static ArrayList<Scenario> importScenarios (String filename) {
 
         // create empty arraylist for storing scenarios imported from file 
         ArrayList<Scenario> scenarios = new ArrayList<Scenario>(0);        
@@ -31,14 +31,14 @@ public class FileIO {
             ArrayList<String> fileLines = new ArrayList<String>(0);
 
             // read all the lines from the file
-            System.out.println("Reading from file: "+filename);
+            // int j = 2;
             while(inStream.hasNextLine()) {
                 fileLines.add(inStream.nextLine());
-                System.out.println(fileLines.get(fileLines.size()-1));
+                // System.out.printf("Line %d: %s \n",j,fileLines.get(fileLines.size()-1));
+                // j++;
             }
             // close file input stream
             inStream.close();
-            System.out.println("Done reading file.\n");
 
             // parse the file contents
             int i = 0;
@@ -48,20 +48,16 @@ public class FileIO {
                 try {
                     //System.out.println(line);
                     String[] sp1 = line.split(",", -1);
-                    //System.out.println("sp1 length: " + sp1.length);
 
                     if(sp1.length != 8) {
-                        throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + i + ": " + line);
+                        throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                     }
 
                     String[] sp2 = sp1[0].split(":",-1);
-                    // System.out.println("sp1[0] " + sp1[0]);
-                    // System.out.println("sp2[0] " + sp2[0]);
     
                     // extract each scenario
                     if(sp2[0].equals("scenario")) {
                         String scDescriptor = sp2[1].toLowerCase(); 
-                        System.out.println("\n**Found scenario: "+ scDescriptor);
 
                         // instantiate a scenario object   
                         Scenario scen = new Scenario(scDescriptor);
@@ -74,19 +70,15 @@ public class FileIO {
                             try {
                                 //System.out.println(line);
                                 String[] sp3 = line.split(",",-1);
-                                //System.out.println("sp3 length: " + sp3.length);
 
                                 if(sp3.length != 8) {
-                                    throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + i + ": " + line);
+                                    throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                                 }
 
                                 String[] sp4 = sp3[0].split(":",-1);
-                                // System.out.println("sp3[0] " + sp3[0]);
-                                // System.out.println("sp4[0] " + sp4[0]);    
                                 
                                 // extract each location
                                 if(sp4[0].equals("location")) {  
-                                    System.out.println("****Found location: " + sp4[1]);
 
                                     String[] locDescriptor = sp4[1].split(";",-1);    
                                     String latitude = locDescriptor[0].toLowerCase();
@@ -108,7 +100,7 @@ public class FileIO {
                                             //System.out.println("sp5 length: " + sp5.length);
 
                                             if(sp5.length != 8) {
-                                                throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + i + ": " + line);
+                                                throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                                             }
 
                                             String[] sp6 = sp5[0].split(":",-1);
@@ -121,7 +113,7 @@ public class FileIO {
                                                 try{
                                                     age = Integer.parseInt(sp5[2]);
                                                 } catch (NumberFormatException e) {
-                                                    System.out.println("WARNING: invalid number format in scenarios file in line " + i);
+                                                    System.out.println("WARNING: invalid number format in scenarios file in line " + (i+1));
                                                     age = DEFAULT_AGE;
                                                 }
                                                 String gender = sp5[1].toLowerCase();                                    
@@ -132,19 +124,19 @@ public class FileIO {
                                                     case "human":
                                                         String profession = sp5[4].toLowerCase();
                                                         String pregnant = sp5[5].toLowerCase();
-                                                        System.out.printf("******Found human: %s,%s,%s,%s,%s\n",sp5[1],sp5[2],sp5[3],sp5[4],sp5[5]);
+                                                        // System.out.printf("******Found human: %s,%s,%s,%s,%s\n",sp5[1],sp5[2],sp5[3],sp5[4],sp5[5]);
                                                         
                                                         // instantiate a human object
-                                                        ch = new Human(gender, age, bodyType, profession, pregnant, i); 
+                                                        ch = new Human(gender, age, bodyType, profession, pregnant, i+1); 
                                                         break;
 
                                                     case "animal":
                                                         String species = sp5[6].toLowerCase();
                                                         String isPet = sp5[7].toLowerCase();
-                                                        System.out.printf("******Found animal: %s,%s,%s,%s,%s\n",sp5[1],sp5[2],sp5[3],sp5[6],sp5[7]);
+                                                        // System.out.printf("******Found animal: %s,%s,%s,%s,%s\n",sp5[1],sp5[2],sp5[3],sp5[6],sp5[7]);
 
                                                         // instantiate a human object
-                                                        ch = new Animal(gender, age, bodyType, species, isPet, i); 
+                                                        ch = new Animal(gender, age, bodyType, species, isPet, i+1); 
                                                         break;
                                                     default:
                                                         // invalid character type
@@ -161,7 +153,7 @@ public class FileIO {
                                         
                                     }
                                     scen.addLocation(loc);
-                                    System.out.println("Number of characters in this location: " + loc.getNumCharacters());
+                                    // System.out.println("Number of characters in this location: " + loc.getNumCharacters());
 
                                 } else {
                                     doneScenario = true;
@@ -174,7 +166,7 @@ public class FileIO {
                             
                         }
                         scenarios.add(scen);
-                        System.out.println("Number of locations in this scenario: " + scen.getNumLocations());
+                        // System.out.println("Number of locations in this scenario: " + scen.getNumLocations());
                     }
 
                 } catch(InvalidDataFormatException e) {
@@ -183,7 +175,7 @@ public class FileIO {
 
                 
             }
-
+            System.out.printf("\n\n%d scenarios imported.\n", scenarios.size());
             
 
         } catch (FileNotFoundException e) {
@@ -200,7 +192,7 @@ public class FileIO {
 
         // testing
         FileIO f = new FileIO();
-        f.importScenarios("scenarios.csv");
+        ArrayList<Scenario> sc = f.importScenarios("scenarios.csv");
 
     }
 
