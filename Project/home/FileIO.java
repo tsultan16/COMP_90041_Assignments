@@ -48,7 +48,7 @@ public class FileIO {
                 i++;
                 try {
                     
-                    System.out.println(line);
+                    //System.out.println(line);
                     String[] sp1 = line.split(",", -1);
                     if(sp1.length != 8) {
                         throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
@@ -59,7 +59,7 @@ public class FileIO {
                     if(sp2[0].equals("scenario")) {
                         String scDescriptor = sp2[1].toLowerCase(); 
 
-                        // System.out.println("**Found scenario: " + scDescriptor);
+                        //System.out.println("**Found scenario: " + scDescriptor);
 
                         // instantiate a scenario object   
                         Scenario scen = new Scenario(scDescriptor);
@@ -87,7 +87,7 @@ public class FileIO {
                                     String longitude = locDescriptor[1].toLowerCase();
                                     String trespassing = locDescriptor[2].toLowerCase(); 
                                     
-                                    // System.out.printf("****Found location: %s, %s, %s\n",latitude, longitude, trespassing);
+                                    //System.out.printf("****Found location: %s, %s, %s\n",latitude, longitude, trespassing);
 
                                     // instantiate a location object
                                     Location loc = new Location(latitude, longitude, trespassing); 

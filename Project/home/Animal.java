@@ -28,7 +28,7 @@ public class Animal extends Character {
 
     //@Override
     public String toString() {
-        String output = this.species;
+        String output = "animal " + this.species;
         if(this.isPet) {
             output += " is pet";
         } 

@@ -133,7 +133,7 @@ public class RescueBot {
             System.out.println("- quit the program: [quit] or [q]");
             System.out.print("> ");
 
-            userInput = this.kb.next();
+            userInput = this.kb.next().toLowerCase();
             if (userInput.equals("judge") || userInput.equals("j")) {
                 // collect user consent, then commence judging
                 this.collectUserConsent();
@@ -162,7 +162,7 @@ public class RescueBot {
         System.out.println("Do you consent to have your decisions saved to a file? (yes/no)");
         while(!done) {
             System.out.print("> ");
-            userInput = kb.next();
+            userInput = kb.next().toLowerCase();
             try{
                 if((userInput.equals("yes")) || (userInput.equals("no"))) {
                     done = true;
@@ -211,7 +211,7 @@ public class RescueBot {
         }
 
         // instantiate the judging engine object
-        rb.jEngine = new JudgingEngine(scenarios);
+        rb.jEngine = new JudgingEngine(scenarios, rb.kb);
 
         // enter main menu loop
         rb.mainMenu();

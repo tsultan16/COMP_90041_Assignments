@@ -8,13 +8,25 @@ public class Location {
     private ArrayList<Character> characters;
 
 
-
+    // default constructor
     public Location(String latitude, String longitude, String tp){
         this.latitude = latitude;
         this.longitude = longitude;
-        this.trespassing = Boolean.parseBoolean(tp);
+        if(tp.equals("legal")) {
+            this.trespassing = false;
+        } else {
+            this.trespassing = true;
+        }
         this.characters = new ArrayList<Character>(0);
         
+    }
+
+    // copy costructor
+    public Location(Location other) {
+        this.latitude = other.getLatitude();
+        this.longitude = other.getLongitude();
+        this.trespassing = other.getTrespassingBool();
+        this.characters = other.getCharacters();
     }
 
 
@@ -32,6 +44,10 @@ public class Location {
 
     public String getLongitude() {
         return this.longitude;
+    }
+
+    public boolean getTrespassingBool () { 
+        return this.trespassing;
     }
 
     public String getTrespassing() {

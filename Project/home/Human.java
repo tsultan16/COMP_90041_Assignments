@@ -98,7 +98,7 @@ public class Human extends Character {
 
     //@Override
     public String toString() {
-        String output = this.getBodyType() + " " + this.ageCategory + " ";
+        String output = "human " + this.getBodyType() + " " + this.ageCategory + " ";
         if(this.ageCategory.equals("adult")) {
             output += this.profession + " ";
         } 

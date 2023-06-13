@@ -35,4 +35,10 @@ public class Scenario {
         return locationsCopy;
     }
 
+    public Location getLocation (int locationNumber) {
+        // return a copy of requested location from this scenario
+        Location locationCopy = new Location(this.locations.get(locationNumber));
+        return locationCopy;
+    }
+
 }

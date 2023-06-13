@@ -1,26 +1,53 @@
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Collections;
+
 public class Test {
 
     public static void main(String[] args) {
+       ArrayList<String> items = new ArrayList<String>(Arrays.asList("human", "pet", "adult", "human", "cat", "doctor", "pregnant", "cat", "human", "adult"));
 
-        String s = "1,2,300000000000000000000000000000000000,4";
-        String s2 = "1,,,";
 
-        String[] sp1 = s.split(",", -1);
-        String[] sp2 = s2.split(",", -1);
-        
-        System.out.println(sp1.length);
-        System.out.println(sp2.length);
+        Map<String, Integer> table = new HashMap<String, Integer>();
 
-        System.out.println("sp1:");  
-        for(int i = 0; i < sp1.length; i++){
-            System.out.printf("%d: %s\n", i, sp1[i]);
+        // get all distinct items from the list
+        Set<String> itemSet = new HashSet<String>(items);
+
+        //System.out.println("Distinct items:");
+        for(String item: itemSet) {
+            int count = Collections.frequency(items, item);
+            table.put(item, count);
         }
 
-        System.out.println("sp2:");  
-        for(int i = 0; i < sp2.length; i++){
-            System.out.printf("%d: %s, %b \n", i, sp2[i], sp2[i].equals(""));
-        }
+        double num = 2.3456;
+        double num2 = 2.35659;
         
+        String numStr = String.format("%.2f", num);
+        String numStr2 = String.format("%.2f", num2);
+        Double numParsed = Double.parseDouble(numStr);
+        Double num2Parsed = Double.parseDouble(numStr2);
+
+
+        System.out.println(num);
+        System.out.println(num2);
+        System.out.println(numStr);
+        System.out.println(numStr2);
+        System.out.println(numParsed);
+        System.out.println(num2Parsed);
+
+        System.out.println(numParsed.compareTo(num2Parsed));    
+
+
+        String s1 = "abcad";
+        String s2 = "abcbd";
+
+        System.out.println(s1.compareTo(s2));
+
+
     }
 
 }
