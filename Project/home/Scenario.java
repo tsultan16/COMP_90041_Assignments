@@ -22,4 +22,17 @@ public class Scenario {
         return this.locations.size();
     }
 
+    public String getDescriptor() {
+        return this.descriptor;
+    }
+
+    public ArrayList<Location> getLocations() {
+        // return a deep copy of the locations array list
+        ArrayList<Location> locationsCopy = new ArrayList<Location>(0);
+        for(Location l: this.locations) {
+            locationsCopy.add(l);
+        }
+        return locationsCopy;
+    }
+
 }

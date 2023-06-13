@@ -68,4 +68,7 @@ public class Character {
         return this.gender;
     }
 
+    public String getBodyType() {
+        return this.bodyType;
+    }
 }

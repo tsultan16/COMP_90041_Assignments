@@ -40,44 +40,46 @@ public class FileIO {
             // close file input stream
             inStream.close();
 
-            // parse the file contents
+            // extract each scenario
             int i = 0;
             while(i <  fileLines.size()) {
+
                 String line = fileLines.get(i);
                 i++;
                 try {
-                    //System.out.println(line);
+                    
+                    System.out.println(line);
                     String[] sp1 = line.split(",", -1);
-
                     if(sp1.length != 8) {
                         throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                     }
+                    String[] sp2 = sp1[0].split(":",-1); 
 
-                    String[] sp2 = sp1[0].split(":",-1);
-    
-                    // extract each scenario
+                    
                     if(sp2[0].equals("scenario")) {
                         String scDescriptor = sp2[1].toLowerCase(); 
+
+                        // System.out.println("**Found scenario: " + scDescriptor);
 
                         // instantiate a scenario object   
                         Scenario scen = new Scenario(scDescriptor);
 
-                        boolean doneScenario = false;
-                        while((!doneScenario) && (i <  fileLines.size())) {
+                        // extract each location
+                        boolean doneLocation = false;
+                        while((!doneLocation) && (i <  fileLines.size())) {
 
                             line =  fileLines.get(i);
                             i++;
+                            // System.out.println("Location loop line read: " + line);
+                        
                             try {
-                                //System.out.println(line);
+                                // System.out.println(line);
                                 String[] sp3 = line.split(",",-1);
-
                                 if(sp3.length != 8) {
                                     throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                                 }
-
-                                String[] sp4 = sp3[0].split(":",-1);
-                                
-                                // extract each location
+                                String[] sp4 = sp3[0].split(":",-1);          
+                            
                                 if(sp4[0].equals("location")) {  
 
                                     String[] locDescriptor = sp4[1].split(";",-1);    
@@ -85,28 +87,28 @@ public class FileIO {
                                     String longitude = locDescriptor[1].toLowerCase();
                                     String trespassing = locDescriptor[2].toLowerCase(); 
                                     
+                                    // System.out.printf("****Found location: %s, %s, %s\n",latitude, longitude, trespassing);
+
                                     // instantiate a location object
                                     Location loc = new Location(latitude, longitude, trespassing); 
-                                    
-                                    boolean doneLocation = false;
-                                    while((!doneLocation) && (i <  fileLines.size())) {
+
+                                    // extract each character
+                                    boolean doneCharacter = false;
+                                    while((!doneCharacter) && (i <  fileLines.size())) {
 
                                         // extract each character
                                         line =  fileLines.get(i);
                                         i++;
-                                        try {
-                                            //System.out.println(line);
-                                            String[] sp5 = line.split(",",-1);
-                                            //System.out.println("sp5 length: " + sp5.length);
 
+                                        // System.out.println("Character loop line read: " + line);
+
+                                        try {
+                                            String[] sp5 = line.split(",",-1);
                                             if(sp5.length != 8) {
                                                 throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                                             }
-
-                                            String[] sp6 = sp5[0].split(":",-1);
-                                            // System.out.println("sp5[0] " + sp5[0]);
-                                            // System.out.println("sp6[0] " + sp6[0]);    
-                                            
+                                            String[] sp6 = sp5[0].split(":",-1);     
+                                                                                
                                             if((sp6[0].equals("human")) || (sp6[0].equals("animal"))) {    
                                                 
                                                 int age;
@@ -139,45 +141,52 @@ public class FileIO {
                                                         ch = new Animal(gender, age, bodyType, species, isPet, i+1); 
                                                         break;
                                                     default:
-                                                        // invalid character type
+                                                        // invalid character type (neither huiman or animal)
+                                                        System.out.println("Invalid character type, neither human nor animal..Aborting");
+                                                        System.exit(1);
                                                 }   
-                                                loc.addCharacter(ch);  
+                                                loc.addCharacter(ch);
+                                                //i++;
+                                                  
 
-                                            } else {
-                                                doneLocation = true;
-                                            }   
+                                            } else{
+                                                doneCharacter = true;
+                                                // System.out.println("\nDone with this location\n");
+                                                i--;
+                                            } 
 
                                         } catch (InvalidDataFormatException e) {
                                             System.out.println(e.getMessage());
                                         }                                       
-                                        
                                     }
+
                                     scen.addLocation(loc);
+                                    
                                     // System.out.println("Number of characters in this location: " + loc.getNumCharacters());
 
                                 } else {
-                                    doneScenario = true;
-                                }
+                                    doneLocation = true;
+                                    // System.out.println("\nDone with this scenario\n");
+                                    i--;
+                                }   
+                                
 
                             } catch(InvalidDataFormatException e) {
                                 System.out.println(e.getMessage());
                             }
-
-                            
+                    
                         }
+
                         scenarios.add(scen);
                         // System.out.println("Number of locations in this scenario: " + scen.getNumLocations());
-                    }
+                    }                 
 
                 } catch(InvalidDataFormatException e) {
                     System.out.println(e.getMessage());
                 }
-
-                
             }
-            System.out.printf("\n\n%d scenarios imported.\n", scenarios.size());
-            
-
+            System.out.printf("%d scenarios imported.\n", scenarios.size());
+        
         } catch (FileNotFoundException e) {
             System.out.println("java.io.FileNotFoundException: could not find scenarios file.");
             System.exit(1);

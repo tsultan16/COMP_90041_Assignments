@@ -26,4 +26,31 @@ public class Location {
         return this.characters.size();
     }
 
+    public String getLatitude() {
+        return this.latitude;
+    }
+
+    public String getLongitude() {
+        return this.longitude;
+    }
+
+    public String getTrespassing() {
+        String tresp;
+        if(this.trespassing) {
+            tresp = "yes";
+        } else {
+            tresp = "no";
+        }
+        return tresp;
+    }
+
+    public ArrayList<Character> getCharacters() {
+        // return a deep copy of the characters array list
+        ArrayList<Character> charactersCopy = new ArrayList<Character>(0);
+        for(Character c: this.characters) {
+            charactersCopy.add(c);
+        }
+        return charactersCopy;
+    }
+
 }

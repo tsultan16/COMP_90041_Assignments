@@ -16,13 +16,17 @@ public class RescueBot {
     private String logFile;
     private String scenarioFile;
     private Scanner kb;
-    private ArrayList<Scenario> scenarios;
+    private boolean userConsented;
+    private JudgingEngine jEngine;
+
+    public static final String DEFAULT_LOGFILE = "rescuebot.log";
 
     public RescueBot() {
-        this.logFile = "";
+        this.logFile = DEFAULT_LOGFILE;
         this.scenarioFile = "";
         this.kb = new Scanner(System.in);
-        this.scenarios = null;
+        this.userConsented = false;
+        this.jEngine = null; 
     }
 
     /**
@@ -91,10 +95,10 @@ public class RescueBot {
         boolean hasScenarioPath = false; 
         boolean showHelp = true;
 
+        // determine if user has provided valid set of command line arguments
         if(args.length == 0){
-            return true;
+            return showHelp;
         } 
-
         for (int i = 0; i < args.length; i++) {
             if((args[i].equals("--log")) || (args[i].equals("-l"))) {
                 lSet = true;
@@ -110,10 +114,11 @@ public class RescueBot {
                 }
             }
         }
+
+        // do not need to display help menu for appropriate set of command line arguments
         if((hasLogPath && lSet && (!sSet)) || (hasScenarioPath && sSet && (!lSet)) || (((hasScenarioPath && sSet) && (hasLogPath && lSet)))) {
             showHelp = false;
         }
-
         return showHelp;    
     }
 
@@ -130,7 +135,9 @@ public class RescueBot {
 
             userInput = this.kb.next();
             if (userInput.equals("judge") || userInput.equals("j")) {
-                // option 1
+                // collect user consent, then commence judging
+                this.collectUserConsent();
+                this.jEngine.startJudging();
                 
             } else if (userInput.equals("run") || userInput.equals("r")) {
                 // option 2
@@ -147,6 +154,30 @@ public class RescueBot {
             }       
 
         } while (!done);
+    }
+
+    private void collectUserConsent() {
+        boolean done = false;
+        String userInput = "";
+        System.out.println("Do you consent to have your decisions saved to a file? (yes/no)");
+        while(!done) {
+            System.out.print("> ");
+            userInput = kb.next();
+            try{
+                if((userInput.equals("yes")) || (userInput.equals("no"))) {
+                    done = true;
+                } else {
+                    throw new InvalidInputException("Invalid response! Do you consent to have your decisions saved to a file? (yes/no)");
+                }
+            } catch (InvalidInputException e) { 
+                System.out.println(e.getMessage());
+            }
+            
+        } 
+        if (userInput.equals("yes")) {
+            this.userConsented = true;
+        } 
+
     }
 
     /**
@@ -167,11 +198,20 @@ public class RescueBot {
         // display welcome message to screen
         rb.welcomeMsg();
 
-        // import scenarios file (if option provided)
+        // import scenarios file (if option provided), otrherwise generate randomly
+        ArrayList<Scenario> scenarios = null;
+
         if(!rb.scenarioFile.equals("")){
-            System.out.println("Importing scenarios file: " + rb.scenarioFile);
-            rb.scenarios = FileIO.importScenarios(rb.scenarioFile);
+            //System.out.println("Importing scenarios file: " + rb.scenarioFile);
+            scenarios = FileIO.importScenarios(rb.scenarioFile);
+        } else {
+
+            // GENERATE RANDOM SCENARIOS and store them in rb.scenarios
+
         }
+
+        // instantiate the judging engine object
+        rb.jEngine = new JudgingEngine(scenarios);
 
         // enter main menu loop
         rb.mainMenu();

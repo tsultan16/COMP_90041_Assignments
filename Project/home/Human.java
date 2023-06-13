@@ -10,6 +10,7 @@ public class Human extends Character {
     public Human(String gender, int age, String bodyType, String profession, String pregnant, int lineNum) {       
         super(gender, age, bodyType, lineNum);
         this.ageCategory = this.categorizeAge(this.getAge());
+        
         if(!this.ageCategory.equals("adult")){
             // default profession for non-adults
             try{
@@ -22,7 +23,6 @@ public class Human extends Character {
                 System.out.println(e.getMessage());
                 this.profession = DEFAULT_PROFESSION;
             }
-
         } else {
             this.profession = this.validProfession(profession, lineNum);
         }
@@ -38,7 +38,6 @@ public class Human extends Character {
                 System.out.println(e.getMessage());
                 this.pregnant = false;
             }
-
         } else {
             if(!this.ageCategory.equals("adult")){
                 try {
@@ -95,6 +94,19 @@ public class Human extends Character {
             valid =  DEFAULT_PROFESSION;
         } 
         return valid;
+    }
+
+    //@Override
+    public String toString() {
+        String output = this.getBodyType() + " " + this.ageCategory + " ";
+        if(this.ageCategory.equals("adult")) {
+            output += this.profession + " ";
+        } 
+        output += this.getGender();
+        if(this.pregnant) {
+           output += " pregnant"; 
+        }
+        return output;
     }
 
 }
