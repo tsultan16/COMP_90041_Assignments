@@ -117,7 +117,13 @@ public class JudgingEngine {
             ArrayList<Character> characters = loc.getCharacters();
             System.out.printf("%d Characters:\n",characters.size());
             for (Character ch: characters) {
-                System.out.println("- " + ch.toString());
+                String characteristics = ch.toString();
+                String[] sp = characteristics.split(" ");
+                characteristics = sp[1];
+                for(int j = 2; j < sp.length; j++) {
+                    characteristics += " " + sp[j]; 
+                }
+                System.out.println("- " + characteristics);
             }
         }
 
@@ -128,7 +134,7 @@ public class JudgingEngine {
         while(!done) {
             System.out.print("> ");
             try {
-                userOption = kb.nextInt();
+                userOption = Integer.parseInt(kb.next());
                 if((userOption < 1) || (userOption > locations.size())) {
                     throw new Exception();
                 } else {

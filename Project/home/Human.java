@@ -11,6 +11,7 @@ public class Human extends Character {
         super(gender, age, bodyType, lineNum);
         this.ageCategory = this.categorizeAge(this.getAge());
         
+        // check that only adults have non-default professions
         if(!this.ageCategory.equals("adult")){
             // default profession for non-adults
             try{
@@ -27,6 +28,7 @@ public class Human extends Character {
             this.profession = this.validProfession(profession, lineNum);
         }
         
+        // check that only adult females are pregnant
         if (this.getGender().equals("male")) {
             try {
                 if(pregnant.equals("true")) {

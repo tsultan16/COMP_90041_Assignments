@@ -60,7 +60,7 @@ public class FileManager {
         try {
             // open file input stream
             inStream = new Scanner(new FileInputStream(this.scenarioFile));
-            System.out.println("Reading from scenario file: " + this.scenarioFile);
+            //System.out.println("Reading from scenario file: " + this.scenarioFile);
 
             // skip the first line (column headers)
             inStream.nextLine();
@@ -127,7 +127,7 @@ public class FileManager {
                                     // System.out.printf("****Found location: %s, %s, %s\n",latitude, longitude, trespassing);
 
                                     // instantiate a location object
-                                    Location loc = new Location(latitude, longitude, trespassing); 
+                                    Location loc = new Location(latitude, longitude, trespassing, i+1); 
 
                                     // extract each character
                                     boolean doneCharacter = false;
