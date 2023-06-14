@@ -242,35 +242,39 @@ public class FileManager {
             // save all relevant information pertaining to each scenario
             for(int s = initScenario; s < finalScenario; s++) {
                 Scenario sc = scenarios.get(s);
-                outStream.println("======================================");
                 outStream.println("# Scenario: " + sc.getDescriptor());
-                outStream.println("======================================");
-
                 ArrayList<Location> locations = sc.getLocations();
                 outStream.println(locations.size() +" locations");
                 for (int i = 1; i <= locations.size(); i++) {
                     Location loc = locations.get(i-1);
                     outStream.printf("[%d] Location: %s, %s\n",i, loc.getLatitude(), loc.getLongitude());
                     outStream.println("Trespassing: " + loc.getTrespassing());
+                    int numHumans = 0, numAnimals = 0, totalHumanAge = 0;
                     // show each character
                     ArrayList<Character> characters = loc.getCharacters();
                     outStream.printf("%d characters\n",characters.size());
                     for (Character ch: characters) {
-                        outStream.println("- " + ch);
+                        String[] sp = ch.toString().split(" ");
+                        if (sp[0].equals("human")) {
+                            numHumans++;
+                            totalHumanAge += ch.getAge();
+                        } else {
+                            numAnimals++;
+                        }
+                        outStream.println("- " + ch.getAge() + " " + ch);
                     }
+                    outStream.println("Humans: " + numHumans + " TotalHumanAge: " +  totalHumanAge + " Animals: " + numAnimals);
                 }
 
                 // save user decisions if user has consented
                 if (decisionMaker.equals("USER")) {
                     if(this.userConsented) {
-                        outStream.println("\n--------------------------------------");
                         outStream.println("** USER Decision Location Number: " + (decisions[s]+1));
-                        outStream.println("--------------------------------------\n");
+                    } else {
+                        outStream.println("** USER Decision Location Number: noConsent");
                     }
                 } else {
-                    outStream.println("\n--------------------------------------");
                     outStream.println("** ALGORITHM Decision Location Number: " + (decisions[s]+1));
-                    outStream.println("--------------------------------------\n");
                 }
                 
             } 
@@ -282,6 +286,38 @@ public class FileManager {
             System.out.println("ERROR: could not print results. Target directory does not exist.");
             System.exit(1);
         }
+    }
+
+    public ArrayList<String> importLogFile() throws Exception{
+
+        // read and return all lines from the logfile
+        // open and read from scenario file
+        Scanner inStream = null;
+        ArrayList<String> fileLines = null;
+        
+        // open file input stream
+        inStream = new Scanner(new FileInputStream(this.logFile));
+
+        // make sure file is not empty
+        if (!inStream.hasNextLine()) {
+            throw new Exception();
+        }
+        
+        fileLines = new ArrayList<String>(0);
+
+        // read all the lines from the file
+        int j = 1;
+        while(inStream.hasNextLine()) {
+            fileLines.add(inStream.nextLine());
+            System.out.printf("Line %d: %s \n",j,fileLines.get(fileLines.size()-1));
+            j++;
+        }
+        // close file input stream
+        inStream.close();
+
+        System.out.println("Done reading from log file!");
+        return fileLines;
+
     }
 
 

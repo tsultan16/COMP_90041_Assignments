@@ -11,7 +11,7 @@ public class UserJudgingEngine implements JudgingEngine {
     private int lastScenarioJudged;
     private int[] userDecisions;
     private Scanner kb;
-    private ArrayList<String> allCharactersCharacteristics;
+    private ArrayList<String> allScenariosCharacteristics;
     private FileManager fManager;
     private RandomScenarioGenerator rsGenerator;
 
@@ -190,7 +190,7 @@ public class UserJudgingEngine implements JudgingEngine {
 
     private void storeAllCharacteristic() {
 
-        this.allCharactersCharacteristics = new ArrayList<String>(0);
+        this.allScenariosCharacteristics = new ArrayList<String>(0);
 
          // iterate over every scenario and location, collect characteristic from all characters
         for(int i = 0; i < this.scenarios.size(); i++){
@@ -214,14 +214,14 @@ public class UserJudgingEngine implements JudgingEngine {
                         // exclude default values (i.e none, unknown, unspecified)
                         if((!characteristic.equals("none")) && (!characteristic.equals("unknown")) &&
                            (!characteristic.equals("none"))){
-                            this.allCharactersCharacteristics.add(characteristic);
+                            this.allScenariosCharacteristics.add(characteristic);
                         }
                     } 
                     // also add trespassing characteristic
                     if(loc.getTrespassing().equals("yes")) {
-                        this.allCharactersCharacteristics.add("trespassing");
+                        this.allScenariosCharacteristics.add("trespassing");
                     } else {
-                        this.allCharactersCharacteristics.add("legal");
+                        this.allScenariosCharacteristics.add("legal");
                     }
                 }
             }
@@ -230,13 +230,13 @@ public class UserJudgingEngine implements JudgingEngine {
         /* 
 
             // get all distinct characteristics
-            Set<String> distinctCharacteristics = new HashSet<String>(this.allCharactersCharacteristics);
+            Set<String> distinctCharacteristics = new HashSet<String>(this.allScenariosCharacteristics);
 
             // show frequency of occurance of each distinct characteristic 
             System.out.println("------------------------");
             System.out.println("Characteristic Counts: ");
             for(String c: distinctCharacteristics) {
-                System.out.printf("%s : %d \n", c, Collections.frequency(this.allCharactersCharacteristics, c));
+                System.out.printf("%s : %d \n", c, Collections.frequency(this.allScenariosCharacteristics, c));
             }
 
         */ 
@@ -307,14 +307,14 @@ public class UserJudgingEngine implements JudgingEngine {
         // (the statistic value for a given characteristic is just the ratio of frequency counts for saved characters to all available characters)
 
         // get set of all distinct characteristics from all scenarios
-        Set<String> distinctCharacteristics = new HashSet<String>(this.allCharactersCharacteristics);
+        Set<String> distinctCharacteristics = new HashSet<String>(this.allScenariosCharacteristics);
 
         // compute frequency counts and statistic of each distinct characteristic across the saved characters and all characters 
         //System.out.println("------------------------");
         //System.out.println("Characteristic Counts: ");
         for(String c: distinctCharacteristics) {
             int countSavedCharacters = Collections.frequency(savedCharactersCharacteristics, c);
-            int countAllCharacters = Collections.frequency(this.allCharactersCharacteristics, c);
+            int countAllCharacters = Collections.frequency(this.allScenariosCharacteristics, c);
             double stat = (double) countSavedCharacters / (double) countAllCharacters; 
             //System.out.printf("Charcteristic: %s, Saved count: %d, All count: %d, Statistic: %.2f \n", c, countSavedCharacters, countAllCharacters, stat);
             sortedCharacteristics.add(c);

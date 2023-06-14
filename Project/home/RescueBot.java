@@ -17,6 +17,7 @@ public class RescueBot {
     private FileManager fManager;
     private UserJudgingEngine userJEngine;
     private SimulationJudgingEngine simulationJEngine;
+    private Auditor audit;
 
 
     public RescueBot() {
@@ -25,6 +26,7 @@ public class RescueBot {
         this.fManager = new FileManager(kb);
         this.userJEngine = null; 
         this.simulationJEngine = null; 
+        this.audit = null;
     }
 
 
@@ -118,6 +120,7 @@ public class RescueBot {
             
             } else if (userInput.equals("audit") || userInput.equals("a")) {
                 // option 3
+                this.audit.auditLogHistory();
             
             } else if (userInput.equals("quit") || userInput.equals("q")) {
                 // option 4
@@ -174,6 +177,9 @@ public class RescueBot {
 
         // instantiate the simulation-based judging engine object
         rb.simulationJEngine = new SimulationJudgingEngine(rb.kb, rb.fManager);
+
+        // instantiate the auditor object
+        rb.audit = new Auditor(rb.kb,rb.fManager);
 
         // display welcome message to screen
         rb.welcomeMsg();
