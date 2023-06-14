@@ -66,7 +66,7 @@ public class UserJudgingEngine implements JudgingEngine {
     }
 
     public void judgeScenarios() {
-        System.out.println("User judging in progress...");  
+        //System.out.println("User judging in progress...");  
 
         boolean done = false;
         String userInput = "";

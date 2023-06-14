@@ -61,11 +61,11 @@ public class Auditor {
             logFileData = this.fManager.importLogFile();
             
             // parse the log file data
-            System.out.println("Parsing log file containing " + logFileData.size() + " lines");
+            //System.out.println("Parsing log file containing " + logFileData.size() + " lines");
             this.parseData(logFileData);
 
             // compute and display statistics
-            System.out.println("Computing global statistics");
+            //System.out.println("Computing global statistics");
             this.computeStats();
             
             System.out.println("That's all. Press Enter to return to main menu.");
@@ -97,7 +97,7 @@ public class Auditor {
         int i = 0;
         while (i < data.size()) {
 
-            System.out.printf("Reading line# %d: %s \n", (i+1), data.get(i));
+            //System.out.printf("Reading line# %d: %s \n", (i+1), data.get(i));
 
             // read each scenario
             String[] sp = data.get(i).split(" ");
@@ -108,7 +108,7 @@ public class Auditor {
             int numLocs = Integer.parseInt(sp[0]);
             i++;
 
-            System.out.println("Found scenario with " + numLocs + " locations");
+            //System.out.println("Found scenario with " + numLocs + " locations");
 
             ArrayList<ArrayList<String>> scenarioCharacteristics = new ArrayList<ArrayList<String>>(numLocs);
 
@@ -135,11 +135,11 @@ public class Auditor {
                 int numChars = Integer.parseInt(sp[0]);
                 i++;
 
-                System.out.printf("Location# %d, Num characters: %d \n", j,numChars);
+                //System.out.printf("Location# %d, Num characters: %d \n", j,numChars);
 
                 // read each character
                 for(int k = 0; k < numChars; k++) {
-                    System.out.println(data.get(i));
+                    //System.out.println(data.get(i));
                     sp = data.get(i).split(" ");
                     // accumulate all characteristics from this character
                     locationCharacteristics.add(trespassing);
@@ -149,7 +149,7 @@ public class Auditor {
                     i++;
                 }
                 scenarioCharacteristics.add(locationCharacteristics);
-                System.out.println(data.get(i));
+                //System.out.println(data.get(i));
                 sp = data.get(i).split(" ");
                 humansSaved[j] = Integer.parseInt(sp[1]);
                 humansSavedTotalAge[j] = Integer.parseInt(sp[3]);
@@ -168,7 +168,7 @@ public class Auditor {
 
             String decisionMaker = sp[1];
 
-            System.out.println("Desicion maker: "+ decisionMaker + " , decision: " + sp[5]);
+            //System.out.println("Desicion maker: "+ decisionMaker + " , decision: " + sp[5]);
 
             // user made the decision
             if(decisionMaker.equals("USER")) {
@@ -217,9 +217,9 @@ public class Auditor {
             }
             i++;
         }
-        System.out.println("Done parsing log file data!");
-        System.out.printf("USER -> Humans Saved: %d, Total Age: %d \n",this.humansSavedTotalUser, this.humansSavedTotalAgeUser);
-        System.out.printf("ALGORITHM -> Humans Saved: %d, Total Age: %d \n",this.humansSavedTotalAlgorithm, this.humansSavedTotalAgeAlgorithm);
+        //System.out.println("Done parsing log file data!");
+        //System.out.printf("USER -> Humans Saved: %d, Total Age: %d \n",this.humansSavedTotalUser, this.humansSavedTotalAgeUser);
+        //System.out.printf("ALGORITHM -> Humans Saved: %d, Total Age: %d \n",this.humansSavedTotalAlgorithm, this.humansSavedTotalAgeAlgorithm);
 
         if(this.humansSavedTotalUser > 0) {
             this.savedAverageAgeUser = (double) this.humansSavedTotalAgeUser / (double) this.humansSavedTotalUser;
@@ -242,6 +242,8 @@ public class Auditor {
         this.sortedCharacteristicsAlgorithm = new ArrayList<String>(0);
         this.sortedStatisticsAlgorithm = new ArrayList<String>(0);
 
+        boolean algorithmStatsPrinted = false;
+
          // get set of all distinct characteristics from all scenarios (for both user and algorithm runs)
         Set<String> distinctCharacteristicsUser = new HashSet<String>(this.allUserCharacteristics);
         Set<String> distinctCharacteristicsAlgorithm = new HashSet<String>(this.allAlgorithmCharacteristics);
@@ -256,6 +258,7 @@ public class Auditor {
 
             // display the statistics
             this.displayStats( this.sortedCharacteristicsAlgorithm, this.sortedStatisticsAlgorithm, this.savedAverageAgeAlgorithm, "Algorithm",this.algorithmRuns);
+            algorithmStatsPrinted = true;
         } 
 
         // compute frequency counts and statistic of each distinct characteristic for USER runs 
@@ -263,6 +266,10 @@ public class Auditor {
             this.statsFromCounts(distinctCharacteristicsUser, this.allUserCharacteristics, this.savedUserCharacteristics, this.sortedCharacteristicsUser, this.sortedStatisticsUser);
 
             // display the statistics
+            if(algorithmStatsPrinted){
+                // print a blank line between Algorithm audit stats and User audit stats
+                System.out.println();
+            }
             this.displayStats( this.sortedCharacteristicsUser, this.sortedStatisticsUser, this.savedAverageAgeUser, "User", this.userRuns);
 
         }

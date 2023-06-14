@@ -306,20 +306,19 @@ public class FileManager {
         fileLines = new ArrayList<String>(0);
 
         // read all the lines from the file
-        int j = 1;
+        //int j = 1;
         while(inStream.hasNextLine()) {
             fileLines.add(inStream.nextLine());
-            System.out.printf("Line %d: %s \n",j,fileLines.get(fileLines.size()-1));
-            j++;
+            //System.out.printf("Line %d: %s \n",j,fileLines.get(fileLines.size()-1));
+            //j++;
         }
         // close file input stream
         inStream.close();
 
-        System.out.println("Done reading from log file!");
+        //System.out.println("Done reading from log file!");
         return fileLines;
 
     }
-
 
     private boolean isValidFileName(String filename, String type) {
         boolean valid = false; 

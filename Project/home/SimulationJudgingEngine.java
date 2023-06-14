@@ -57,7 +57,7 @@ public class SimulationJudgingEngine implements JudgingEngine {
     }
 
     public void judgeScenarios() {
-        System.out.println("Simulation judging in progress...");  
+        //System.out.println("Simulation judging in progress...");  
 
         if (!this.fManager.getScenarioProvided()) {
             // prompt user for number of scenarios
