@@ -233,7 +233,7 @@ public class FileManager {
         return scenarios;
     }
 
-    public void saveToLogFile(ArrayList<Scenario> scenarios, int initScenario, int finalScenario, int[] userDecisions) {
+    public void saveToLogFile(ArrayList<Scenario> scenarios, int initScenario, int finalScenario, int[] decisions, String decisionMaker) {
 
         // open file stream and save the scenarios
         try{
@@ -247,25 +247,32 @@ public class FileManager {
                 outStream.println("======================================");
 
                 ArrayList<Location> locations = sc.getLocations();
-                outStream.println("Number of locations: " +locations.size());
+                outStream.println(locations.size() +" locations");
                 for (int i = 1; i <= locations.size(); i++) {
                     Location loc = locations.get(i-1);
                     outStream.printf("[%d] Location: %s, %s\n",i, loc.getLatitude(), loc.getLongitude());
                     outStream.println("Trespassing: " + loc.getTrespassing());
                     // show each character
                     ArrayList<Character> characters = loc.getCharacters();
-                    outStream.printf("%d Characters:\n",characters.size());
+                    outStream.printf("%d characters\n",characters.size());
                     for (Character ch: characters) {
                         outStream.println("- " + ch);
                     }
                 }
 
                 // save user decisions if user has consented
-                if(this.userConsented) {
+                if (decisionMaker.equals("USER")) {
+                    if(this.userConsented) {
+                        outStream.println("\n--------------------------------------");
+                        outStream.println("** USER Decision Location Number: " + (decisions[s]+1));
+                        outStream.println("--------------------------------------\n");
+                    }
+                } else {
                     outStream.println("\n--------------------------------------");
-                    outStream.println("# User Decision Location: " + (userDecisions[s]+1));
+                    outStream.println("** ALGORITHM Decision Location Number: " + (decisions[s]+1));
                     outStream.println("--------------------------------------\n");
                 }
+                
             } 
    
             // close file output stream
@@ -275,6 +282,21 @@ public class FileManager {
             System.out.println("ERROR: could not print results. Target directory does not exist.");
             System.exit(1);
         }
+    }
+
+
+    private boolean isValidFileName(String filename, String type) {
+        boolean valid = false; 
+        String[] sp = filename.split("\\.");
+        for(String s: sp) {
+            System.out.println(s);
+        }
+        if(sp.length > 1) {
+            if(sp[1].equals(type)) {
+                valid = true;
+            }
+        }
+        return valid;
     }
 
     public static void main(String[] args) {

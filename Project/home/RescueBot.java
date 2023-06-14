@@ -15,37 +15,20 @@ public class RescueBot {
 
     private Scanner kb;
     private FileManager fManager;
-    private JudgingEngine jEngine;
-    private RandomScenarioGenerator rsGenerator;
+    private UserJudgingEngine userJEngine;
+    private SimulationJudgingEngine simulationJEngine;
 
 
     public RescueBot() {
    
         this.kb = new Scanner(System.in);
         this.fManager = new FileManager(kb);
-        this.jEngine = null; 
-        this.rsGenerator = new RandomScenarioGenerator();
+        this.userJEngine = null; 
+        this.simulationJEngine = null; 
     }
 
-    /**
-     * Decides whether to save the passengers or the pedestrians
-     * @param Scenario scenario: the ethical dilemma
-     * @return Decision: which group to save
-     */
 
-     /*
-    public static Location decide(Scenario scenario) {
-        // a very simple decision engine
-        // TODO: take into account at least 5 characteristics
-        
-        // 50/50
-        if(Math.random() > 0.5) {
-            return scenario.getLocation(1);
-        } else {
-            return scenario.getLocation(2);
-        }
-    }
-    */
+
 
     private void welcomeMsg() {
         // read welcome message from file and display to screen
@@ -72,19 +55,7 @@ public class RescueBot {
         System.out.println("-l or --log        Optional: path to data log file");      
     }
  
-    private boolean isValidFileName(String filename, String type) {
-        boolean valid = false; 
-        String[] sp = filename.split("\\.");
-        for(String s: sp) {
-            System.out.println(s);
-        }
-        if(sp.length > 1) {
-            if(sp[1].equals(type)) {
-                valid = true;
-            }
-        }
-        return valid;
-    }
+
 
     private boolean extractArgs(String[] args) {
         boolean lSet = false;
@@ -139,10 +110,11 @@ public class RescueBot {
             if (userInput.equals("judge") || userInput.equals("j")) {
                 // collect user consent, then commence judging
                 this.collectUserConsent();
-                this.jEngine.startJudging();
+                this.userJEngine.judgeScenarios();
                 
             } else if (userInput.equals("run") || userInput.equals("r")) {
-                // option 2
+                // run simulation
+                this.simulationJEngine.judgeScenarios();
             
             } else if (userInput.equals("audit") || userInput.equals("a")) {
                 // option 3
@@ -197,23 +169,14 @@ public class RescueBot {
             System.exit(0);
         }
 
+        // instantiate the user-based judging engine object
+        rb.userJEngine = new UserJudgingEngine(rb.kb, rb.fManager);
+
+        // instantiate the simulation-based judging engine object
+        rb.simulationJEngine = new SimulationJudgingEngine(rb.kb, rb.fManager);
+
         // display welcome message to screen
         rb.welcomeMsg();
-
-        // import scenarios file (if option provided), otrherwise generate randomly
-        ArrayList<Scenario> scenarios = null;
-
-        if(rb.fManager.getScenarioProvided()){
-            //System.out.println("Importing scenarios file: " + rb.scenarioFile);
-            scenarios = rb.fManager.importScenarios();
-        } else {
-
-            //generate random scenarios
-            scenarios = rb.rsGenerator.generateScenarios();
-        }
-
-        // instantiate the judging engine object
-        rb.jEngine = new JudgingEngine(scenarios, rb.kb, rb.fManager);
 
         // enter main menu loop
         rb.mainMenu();

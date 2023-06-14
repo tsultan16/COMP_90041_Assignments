@@ -75,6 +75,10 @@ public class Human extends Character {
         this.pregnant = other.getPregnant();
     }
 
+    public String getAgeCategory() {
+        return this.ageCategory;
+    }
+
     public String getProfession() {
         return this.profession;
     }
