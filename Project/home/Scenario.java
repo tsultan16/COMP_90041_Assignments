@@ -6,11 +6,16 @@ public class Scenario {
     private String descriptor;
     private ArrayList<Location> locations;
 
-
+    // default constructor
     public Scenario(String descriptor) {
         this.descriptor = descriptor;
         this.locations = new ArrayList<Location>(0);
+    }
 
+    // copy constructor
+    public Scenario(Scenario other) {
+        this.descriptor = other.getDescriptor();
+        this.locations = other.getLocations();
     }
 
 

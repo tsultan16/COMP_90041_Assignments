@@ -57,6 +57,30 @@ public class Human extends Character {
         }
     }
 
+    // constructor without exception handling
+    public Human(String gender, int age, String bodyType, String profession, boolean pregnant) {        
+        super(gender, age, bodyType);
+        this.ageCategory = this.categorizeAge(age);
+        this.profession = profession;
+        this.pregnant = pregnant;
+    }
+
+    // copy constructor (assumes valid input values, so does not do exception handling)
+    public Human(Human other) {
+        super(other.getGender(), other.getAge(), other.getBodyType());
+        this.ageCategory = this.categorizeAge(other.getAge());
+        this.profession = other.getProfession();
+        this.pregnant = other.getPregnant();
+    }
+
+    public String getProfession() {
+        return this.profession;
+    }
+
+    public boolean getPregnant() {
+        return this.pregnant;
+    }
+
     private String categorizeAge(int age) {
         String category;
         if ((age >= 0) && (age <= 4)) {

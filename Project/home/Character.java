@@ -8,12 +8,27 @@ public class Character {
     public static final int DEFAULT_AGE = 15;
     public static final String DEFAULT_BODYTYPE = "unspecified";
 
-
+    // default constructor
     public Character(String gender, int age, String bodyType, int lineNum) {        
         this.gender = this.validGender(gender, lineNum);
         this.age = this.validAge(age, lineNum);
         this.bodyType = this.validBodyType(bodyType, lineNum);
     }
+
+    // constructor without exception handling
+    public Character(String gender, int age, String bodyType) {        
+        this.gender = gender;
+        this.age = age;
+        this.bodyType = bodyType;
+    }
+
+    // copy constructor
+    public Character(Character other) {
+        this.gender = other.getGender();
+        this.age = other.getAge();
+        this.bodyType = other.getBodyType();
+    }
+
 
     private String validGender(String gender, int lineNum) {
         String valid;    
@@ -71,4 +86,5 @@ public class Character {
     public String getBodyType() {
         return this.bodyType;
     }
+
 }

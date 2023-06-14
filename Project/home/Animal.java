@@ -3,6 +3,7 @@ public class Animal extends Character {
     private String species;
     private boolean isPet;
 
+    // default constructor
     public Animal(String gender, int age, String bodyType, String species, String isPet, int lineNum) {
         super(gender, age, bodyType, lineNum);
         this.species = species;
@@ -25,6 +26,29 @@ public class Animal extends Character {
         }
         
     }
+
+    // constructor without exception handling
+    public Animal(String gender, int age, String bodyType, String species, boolean isPet) {        
+        super(gender, age, bodyType);
+        this.species = species;
+        this.isPet = isPet;
+    }
+
+    // copy constructor (assumes valid input values, so does not do exception handling)
+    public Animal(Animal other) {
+        super(other.getGender(), other.getAge(), other.getBodyType());
+        this.species = other.getSpecies();
+        this.isPet = other.getIsPet();
+    }
+
+    public String getSpecies () {
+        return this.species;
+    }
+
+    public boolean getIsPet() {
+        return this.isPet;
+    }
+
 
     //@Override
     public String toString() {

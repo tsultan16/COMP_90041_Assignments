@@ -13,20 +13,18 @@ import java.util.ArrayList;
 
 public class RescueBot {
 
-    private String logFile;
-    private String scenarioFile;
     private Scanner kb;
-    private boolean userConsented;
+    private FileManager fManager;
     private JudgingEngine jEngine;
+    private RandomScenarioGenerator rsGenerator;
 
-    public static final String DEFAULT_LOGFILE = "rescuebot.log";
 
     public RescueBot() {
-        this.logFile = DEFAULT_LOGFILE;
-        this.scenarioFile = "";
+   
         this.kb = new Scanner(System.in);
-        this.userConsented = false;
+        this.fManager = new FileManager(kb);
         this.jEngine = null; 
+        this.rsGenerator = new RandomScenarioGenerator();
     }
 
     /**
@@ -88,7 +86,7 @@ public class RescueBot {
         return valid;
     }
 
-    private boolean validArgs(String[] args) {
+    private boolean extractArgs(String[] args) {
         boolean lSet = false;
         boolean sSet = false;
         boolean hasLogPath = false;
@@ -97,20 +95,24 @@ public class RescueBot {
 
         // determine if user has provided valid set of command line arguments
         if(args.length == 0){
-            return showHelp;
+            return false;
         } 
         for (int i = 0; i < args.length; i++) {
             if((args[i].equals("--log")) || (args[i].equals("-l"))) {
                 lSet = true;
-                if(((i+1) < args.length) && (this.isValidFileName(args[i+1], "log"))) {
-                    hasLogPath = true;
-                    this.logFile = args[i+1];    
+                if((i+1) < args.length) {
+                    if(args[i+1].charAt(0) != '-') {
+                        hasLogPath = true;
+                        this.fManager.setLogFile(args[i+1]);
+                    }
                 }
             } else if((args[i].equals("--scenarios")) || (args[i].equals("-s"))) {
                 sSet = true;
-                if(((i+1) < args.length) && (this.isValidFileName(args[i+1], "csv"))) {
-                    hasScenarioPath = true;
-                    this.scenarioFile = args[i+1];    
+                if((i+1) < args.length) {
+                    if(args[i+1].charAt(0) != '-') {
+                        hasScenarioPath = true;
+                        this.fManager.setScenarioFile(args[i+1]);
+                    }
                 }
             }
         }
@@ -175,7 +177,7 @@ public class RescueBot {
             
         } 
         if (userInput.equals("yes")) {
-            this.userConsented = true;
+            this.fManager.setUserConsented();
         } 
 
     }
@@ -188,8 +190,8 @@ public class RescueBot {
         // instantiate a rescuebot objec
         RescueBot rb = new RescueBot();
 
-        // check for valid command line arguments
-        boolean showHelp = rb.validArgs(args);
+        // extract command line arguments
+        boolean showHelp = rb.extractArgs(args);
         if(showHelp) { 
             rb.helpMenu();
             System.exit(0);
@@ -201,17 +203,17 @@ public class RescueBot {
         // import scenarios file (if option provided), otrherwise generate randomly
         ArrayList<Scenario> scenarios = null;
 
-        if(!rb.scenarioFile.equals("")){
+        if(rb.fManager.getScenarioProvided()){
             //System.out.println("Importing scenarios file: " + rb.scenarioFile);
-            scenarios = FileIO.importScenarios(rb.scenarioFile);
+            scenarios = rb.fManager.importScenarios();
         } else {
 
-            // GENERATE RANDOM SCENARIOS and store them in rb.scenarios
-
+            //generate random scenarios
+            scenarios = rb.rsGenerator.generateScenarios();
         }
 
         // instantiate the judging engine object
-        rb.jEngine = new JudgingEngine(scenarios, rb.kb);
+        rb.jEngine = new JudgingEngine(scenarios, rb.kb, rb.fManager);
 
         // enter main menu loop
         rb.mainMenu();

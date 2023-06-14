@@ -66,6 +66,7 @@ public class Location {
         for(Character c: this.characters) {
             charactersCopy.add(c);
         }
+
         return charactersCopy;
     }
 
