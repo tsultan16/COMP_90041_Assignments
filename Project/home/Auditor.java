@@ -8,14 +8,22 @@ public class Auditor {
 
     private Scanner kb;
     private FileManager fManager;   
-    private int humansSavedTotalUser = 0;
-    private int humansSavedTotalAlgorithm = 0;
-    private int humansSavedTotalAgeUser = 0;
-    private int humansSavedTotalAgeAlgorithm = 0;
+    private int humansSavedTotalUser;
+    private int humansSavedTotalAlgorithm;
+    private int humansSavedTotalAgeUser;
+    private int humansSavedTotalAgeAlgorithm;
+    private double savedAverageAgeUser;
+    private double savedAverageAgeAlgorithm;
+    private int userRuns;
+    private int algorithmRuns;
     private ArrayList<String> allUserCharacteristics;
-    private ArrayList<String> allSimulationCharacteristics;
+    private ArrayList<String> allAlgorithmCharacteristics;
     private ArrayList<String> savedUserCharacteristics;
-    private ArrayList<String> savedSimulationCharacteristics;
+    private ArrayList<String> savedAlgorithmCharacteristics;
+    private ArrayList<String> sortedCharacteristicsUser;
+    private ArrayList<String> sortedStatisticsUser;
+    private ArrayList<String> sortedCharacteristicsAlgorithm;
+    private ArrayList<String> sortedStatisticsAlgorithm;
 
     // default constructor
     public Auditor(Scanner kb, FileManager fManager) {
@@ -26,11 +34,21 @@ public class Auditor {
         this.humansSavedTotalAlgorithm = 0;
         this.humansSavedTotalAgeUser = 0;
         this.humansSavedTotalAgeAlgorithm = 0;
+        this.savedAverageAgeUser = 0.0;
+        this.savedAverageAgeAlgorithm = 0.0;
+        this.userRuns = 0;
+        this.algorithmRuns = 0;
 
         this.allUserCharacteristics = null;
-        this.allSimulationCharacteristics = null;
+        this.allAlgorithmCharacteristics = null;
         this.savedUserCharacteristics = null;
-        this.savedSimulationCharacteristics = null;
+        this.savedAlgorithmCharacteristics = null;
+
+        this.sortedCharacteristicsUser = null;
+        this.sortedStatisticsUser = null;
+        this.sortedCharacteristicsAlgorithm = null;
+        this.sortedStatisticsAlgorithm = null;
+
     }
 
     // audit judged scenarios from log file history
@@ -46,8 +64,9 @@ public class Auditor {
             System.out.println("Parsing log file containing " + logFileData.size() + " lines");
             this.parseData(logFileData);
 
-            // compute statistics
+            // compute and display statistics
             System.out.println("Computing global statistics");
+            this.computeStats();
             
             System.out.println("That's all. Press Enter to return to main menu.");
 
@@ -66,9 +85,9 @@ public class Auditor {
     private void parseData(ArrayList<String> data) {
 
         this.allUserCharacteristics = new ArrayList<String>(0);
-        this.allSimulationCharacteristics = new ArrayList<String>(0);
+        this.allAlgorithmCharacteristics = new ArrayList<String>(0);
         this.savedUserCharacteristics = new ArrayList<String>(0);
-        this.savedSimulationCharacteristics  = new ArrayList<String>(0);
+        this.savedAlgorithmCharacteristics  = new ArrayList<String>(0);
 
         this.humansSavedTotalUser = 0;
         this.humansSavedTotalAlgorithm = 0;
@@ -172,6 +191,7 @@ public class Auditor {
 
                     this.humansSavedTotalUser += humansSaved[decision];
                     this.humansSavedTotalAgeUser += humansSavedTotalAge[decision];
+                    this.userRuns++;
                 } 
 
             // algorithm made the decision    
@@ -184,15 +204,16 @@ public class Auditor {
                 for(int j = 0; j < scenarioCharacteristics.size(); j++) {
                     ArrayList<String> sc = scenarioCharacteristics.get(j);
                     for(String characteristic: sc) {
-                        this.allSimulationCharacteristics.add(characteristic);
+                        this.allAlgorithmCharacteristics.add(characteristic);
                         if(decision == j) {
-                            this.savedSimulationCharacteristics.add(characteristic);
+                            this.savedAlgorithmCharacteristics.add(characteristic);
                         }
                     }
                 } 
 
                 this.humansSavedTotalAlgorithm += humansSaved[decision];
                 this.humansSavedTotalAgeAlgorithm += humansSavedTotalAge[decision];
+                this.algorithmRuns++;
             }
             i++;
         }
@@ -200,76 +221,77 @@ public class Auditor {
         System.out.printf("USER -> Humans Saved: %d, Total Age: %d \n",this.humansSavedTotalUser, this.humansSavedTotalAgeUser);
         System.out.printf("ALGORITHM -> Humans Saved: %d, Total Age: %d \n",this.humansSavedTotalAlgorithm, this.humansSavedTotalAgeAlgorithm);
 
+        if(this.humansSavedTotalUser > 0) {
+            this.savedAverageAgeUser = (double) this.humansSavedTotalAgeUser / (double) this.humansSavedTotalUser;
+        }
+    
+        if(this.humansSavedTotalAlgorithm > 0) {
+            this.savedAverageAgeAlgorithm = (double) this.humansSavedTotalAgeAlgorithm / (double) this.humansSavedTotalAlgorithm;
+        }
+
+
     }
 
-    /*
+    
 
     // computes the statistics for caracteristics of saved characters from all scenarios judged so far
-    private void computeStats(ArrayList<String> sortedCharacteristics, ArrayList<String> sortedStatistics) {
+    private void computeStats() {
         
-        ArrayList<String> savedCharactersCharacteristics = new ArrayList<String>(0);
-        Double averageAge = 0.0, totalAge = 0.0;
-        int numHumans = 0;
+        this.sortedCharacteristicsUser = new ArrayList<String>(0);
+        this.sortedStatisticsUser = new ArrayList<String>(0);
+        this.sortedCharacteristicsAlgorithm = new ArrayList<String>(0);
+        this.sortedStatisticsAlgorithm = new ArrayList<String>(0);
 
-        // iterate over judged scenario and locations, collect characteristics from all characters who have been saved
-        for(int i = 0; i < this.scenarios.size(); i++){
-           
-            Scenario sc = this.scenarios.get(i);
-            Location loc = sc.getLocation(this.simulationDecisions[i]);
+         // get set of all distinct characteristics from all scenarios (for both user and algorithm runs)
+        Set<String> distinctCharacteristicsUser = new HashSet<String>(this.allUserCharacteristics);
+        Set<String> distinctCharacteristicsAlgorithm = new HashSet<String>(this.allAlgorithmCharacteristics);
 
-
-            //System.out.printf("Location: %s, %s\n", loc.getLatitude(), loc.getLongitude());
-            //System.out.println("Trespassing: " + loc.getTrespassing());
-            // show each character
-            ArrayList<Character> characters = loc.getCharacters();
-            //System.out.printf("%d Characters:\n",characters.size());
-            for (Character ch: characters) {
-                //System.out.println("- " + ch);
-                String[] characteristics = ch.toString().split(" ");
-                for(String characteristic: characteristics) {
-                    // exclude default values (i.e none, unknown, unspecified)
-                    if((!characteristic.equals("none")) && (!characteristic.equals("unknown")) &&
-                        (!characteristic.equals("none"))){
-                        savedCharactersCharacteristics.add(characteristic);
-                    }
-                } 
-                // also add trespassing characteristic
-                if(loc.getTrespassing().equals("yes")) {
-                    savedCharactersCharacteristics.add("trespassing");
-                } else {
-                    savedCharactersCharacteristics.add("legal");
-                }
-                // keep track of human age total and count
-                if(characteristics[0].equals("human")) {
-                    numHumans++;
-                    totalAge += ch.getAge();
-                }
-            }
-        }
-
-        // now compute the compute the statistic value for each distinct characteristic across all saved characters
-        // (the statistic value for a given characteristic is just the ratio of frequency counts for saved characters to all available characters)
-
-        // get set of all distinct characteristics from all scenarios
-        Set<String> distinctCharacteristics = new HashSet<String>(this.allScenariosCharacteristics);
-
-        // compute frequency counts and statistic of each distinct characteristic across the saved characters and all characters 
+        
         //System.out.println("------------------------");
         //System.out.println("Characteristic Counts: ");
-        for(String c: distinctCharacteristics) {
-            int countSavedCharacters = Collections.frequency(savedCharactersCharacteristics, c);
-            int countAllCharacters = Collections.frequency(this.allScenariosCharacteristics, c);
+
+        // compute frequency counts and statistic of each distinct characteristic for ALGORITHM runs
+        if(this.savedAlgorithmCharacteristics.size() > 0){
+            this.statsFromCounts(distinctCharacteristicsAlgorithm, this.allAlgorithmCharacteristics, this.savedAlgorithmCharacteristics, this.sortedCharacteristicsAlgorithm, this.sortedStatisticsAlgorithm);
+
+            // display the statistics
+            this.displayStats( this.sortedCharacteristicsAlgorithm, this.sortedStatisticsAlgorithm, this.savedAverageAgeAlgorithm, "Algorithm",this.algorithmRuns);
+        } 
+
+        // compute frequency counts and statistic of each distinct characteristic for USER runs 
+        if(this.savedUserCharacteristics.size() > 0){
+            this.statsFromCounts(distinctCharacteristicsUser, this.allUserCharacteristics, this.savedUserCharacteristics, this.sortedCharacteristicsUser, this.sortedStatisticsUser);
+
+            // display the statistics
+            this.displayStats( this.sortedCharacteristicsUser, this.sortedStatisticsUser, this.savedAverageAgeUser, "User", this.userRuns);
+
+        }
+        
+   
+    }
+
+
+    private void statsFromCounts(Set<String> distinctChars, ArrayList<String> allChars, ArrayList<String> savedChars, ArrayList<String> sortedChars, ArrayList<String> sortedStats) {
+        //double averageAge =  0.0;
+
+        // compute frequency counts and statistic of each distinct characteristic for USER runs 
+        for(String c: distinctChars) {
+            int countSavedCharacters = Collections.frequency(savedChars, c);
+            int countAllCharacters = Collections.frequency(allChars, c);
             double stat = (double) countSavedCharacters / (double) countAllCharacters; 
             //System.out.printf("Charcteristic: %s, Saved count: %d, All count: %d, Statistic: %.2f \n", c, countSavedCharacters, countAllCharacters, stat);
-            sortedCharacteristics.add(c);
-            sortedStatistics.add(String.format("%.2f",stat));
+            sortedChars.add(c);
+            sortedStats.add(String.format("%.2f",stat));
         }
-
         // compute average age and add it to statistics arraylist
-        averageAge = totalAge/numHumans;
-        sortedStatistics.add(String.format("%.2f",averageAge));
+        // averageAge = (double) this.humansSavedTotalAgeUser / (double) this.humansSavedTotalUser;
+        // sortedStats.add(String.format("%.2f",averageAge));
+
+        // sort the statistics
+        this.sortStats(sortedChars, sortedStats);
 
     }
+
 
     // performs selection sort on a collection of statistic values
     private void sortStats(ArrayList<String> sortedCharacteristics, ArrayList<String> sortedStatistics) {
@@ -300,19 +322,18 @@ public class Auditor {
         }
     }
     
-    private void displayStatistics(ArrayList<String> sortedCharacteristics, ArrayList<String> sortedStatistics) {
+
+    private void displayStats(ArrayList<String> sortedCharacteristics, ArrayList<String> sortedStatistics, double averageAge, String decisionMaker, int numRuns) {
 
         System.out.println("======================================");
-        System.out.println("# Statistic");
+        System.out.printf("# %s Audit\n", decisionMaker);
         System.out.println("======================================");     
-        System.out.printf("- %% SAVED AFTER %d RUNS\n",this.scenarios.size());
+        System.out.printf("- %% SAVED AFTER %d RUNS\n", numRuns);
         int i = 0;
         for(i = 0; i < sortedCharacteristics.size(); i++){
             System.out.printf("%s: %s\n", sortedCharacteristics.get(i), sortedStatistics.get(i));
         }
-        System.out.printf("--\naverage age: %s\n",sortedStatistics.get(i));
+        System.out.printf("--\naverage age: %.2f\n",averageAge);
     }
-
- */
 
 }
