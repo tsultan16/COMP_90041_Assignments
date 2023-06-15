@@ -4,19 +4,38 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.io.File;
 
+/**
+ * A class for managing all file IO tasks, such as reading from scenario file and
+ * reading/writing into log file.
+ *
+ * @author: Tanzid Sultan
+ * ID# 1430660, Email: tanzids@student.unimelb.edu.au
+ */
 public class FileManager {
 
+    /**
+     * constants
+     */
+    public static final String DEFAULT_LOGFILE = "rescuebot.log";
 
+    /**
+    *  instance variables 
+    */
     private String logFile;
     private String scenarioFile;
     private boolean logProvided;
     private boolean scenarioProvided;
     private boolean userConsented;
     private Scanner kb;
+    private ArrayList <Scenario> fileScenarios;
 
-    public static final String DEFAULT_LOGFILE = "rescuebot.log";
-
+    /**
+	 * Class Constructor
+     *
+	 * @param kb  Scanner object for reading keyboard input stream
+	 */
     public FileManager(Scanner kb) {
         this.logFile = DEFAULT_LOGFILE;
         this.scenarioFile = "";
@@ -24,35 +43,107 @@ public class FileManager {
         this.scenarioProvided = false;
         this.userConsented = false;
         this.kb = kb;
+        this.fileScenarios = null;
     }
 
-    public void setScenarioFile(String filename) {
-        this.scenarioFile = filename;
-        this.scenarioProvided = true;
+    /**
+	 * Accessor method for retrieving imported scenarios data.
+     * 
+     * @return a copy of the array list containing imported scenarios
+	 */
+    public ArrayList <Scenario> getFileScenarios() {
+        // return a deep copy of the scenarios array list
+        ArrayList<Scenario> scenariosCopy = new ArrayList<Scenario>(0);
+        for (Scenario sc: this.fileScenarios) {
+            scenariosCopy.add(new Scenario(sc));
+        }
+        return scenariosCopy;
     }
 
+     /**
+	 * Mutator method 
+     * 
+     * @param  filename  user provided scenario filepath
+     * @return  whether user provided filepath is valid 
+	 */
+    public boolean setScenarioFile(String filename) {
+
+        File f = new File(filename);
+        try {
+            if (f.exists()) { 
+                this.scenarioFile = filename;
+                this.scenarioProvided = true;        
+            } else {
+                throw new FileNotFoundException("java.io.FileNotFoundException: could not find scenarios file.");
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+         
+        return this.scenarioProvided;
+    }
+
+    /**
+	 * Mutator method 
+     * 
+     * @param filename  user provided log filepath
+	 */
     public void setLogFile(String filename) {
         this.logFile = filename;
         // setting logProvided flag tells us that the user has provided a file (in case the user file has the same name as the default filename, this flag will distinguish this case)
         this.logProvided = true;
     }
 
-    public void setUserConsented() {
-        this.userConsented = true;
-    }
-
+    /**
+	 * Accessor method 
+     * 
+     * @return  scenarios file path
+	 */
     public String getScenarioFile() {
         return this.scenarioFile;
     }
 
+     /**
+	 * Accessor method 
+     * 
+     * @return  whether valid scenarios file path has been provided by user
+	 */
     public boolean getScenarioProvided() {
         return this.scenarioProvided;
     }
 
-    public ArrayList<Scenario> importScenarios () {
+    /**
+	 * Helper method for prompting user's consent for saving decisions to log file 
+	 */
+    public void collectUserConsent() {
+        boolean done = false;
+        String userInput = "";
+        System.out.println("Do you consent to have your decisions saved to a file? (yes/no)");
+        while (!done) {
+            System.out.print("> ");
+            userInput = this.kb.next().toLowerCase();
+            try {
+                if ((userInput.equals("yes")) || (userInput.equals("no"))) {
+                    done = true;
+                } else {
+                    throw new InvalidInputException("Invalid response! Do you consent to have your decisions saved to a file? (yes/no)");
+                }
+            } catch (InvalidInputException e) { 
+                System.out.println(e.getMessage());
+            }   
+        } 
+        if (userInput.equals("yes")) {
+            this.userConsented = true;
+        } 
+    }
+
+    /**
+	 * Helper method for importing data from scenarios file provided by user
+	 */
+    public void importScenarios () {
 
         // create empty arraylist for storing scenarios imported from file 
-        ArrayList<Scenario> scenarios = new ArrayList<Scenario>(0);        
+        this.fileScenarios = new ArrayList<Scenario>(0);        
 
         // open and read from scenario file
         Scanner inStream = null;
@@ -60,7 +151,6 @@ public class FileManager {
         try {
             // open file input stream
             inStream = new Scanner(new FileInputStream(this.scenarioFile));
-            //System.out.println("Reading from scenario file: " + this.scenarioFile);
 
             // skip the first line (column headers)
             inStream.nextLine();
@@ -68,26 +158,22 @@ public class FileManager {
             ArrayList<String> fileLines = new ArrayList<String>(0);
 
             // read all the lines from the file
-            // int j = 2;
-            while(inStream.hasNextLine()) {
+            while (inStream.hasNextLine()) {
                 fileLines.add(inStream.nextLine());
-                // System.out.printf("Line %d: %s \n",j,fileLines.get(fileLines.size()-1));
-                // j++;
             }
             // close file input stream
             inStream.close();
 
             // extract each scenario
             int i = 0;
-            while(i <  fileLines.size()) {
+            while (i <  fileLines.size()) {
 
                 String line = fileLines.get(i);
                 i++;
                 try {
                     
-                    //System.out.println(line);
                     String[] sp1 = line.split(",", -1);
-                    if(sp1.length != 8) {
+                    if (sp1.length != 8) {
                         throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                     }
                     String[] sp2 = sp1[0].split(":",-1); 
@@ -95,50 +181,39 @@ public class FileManager {
                     
                     if(sp2[0].equals("scenario")) {
                         String scDescriptor = sp2[1].toLowerCase(); 
-
-                        // System.out.println("**Found scenario: " + scDescriptor);
-
                         // instantiate a scenario object   
                         Scenario scen = new Scenario(scDescriptor);
-
+                        
                         // extract each location
                         boolean doneLocation = false;
-                        while((!doneLocation) && (i <  fileLines.size())) {
+                        while ((!doneLocation) && (i <  fileLines.size())) {
 
                             line =  fileLines.get(i);
-                            i++;
-                            // System.out.println("Location loop line read: " + line);
-                        
+                            i++;                        
                             try {
-                                // System.out.println(line);
                                 String[] sp3 = line.split(",",-1);
-                                if(sp3.length != 8) {
+                                if (sp3.length != 8) {
                                     throw new InvalidDataFormatException("WARNING: invalid data format in scenarios file in line " + (i+1) + ": " + line);
                                 }
                                 String[] sp4 = sp3[0].split(":",-1);          
                             
-                                if(sp4[0].equals("location")) {  
+                                if (sp4[0].equals("location")) {  
 
                                     String[] locDescriptor = sp4[1].split(";",-1);    
                                     String latitude = locDescriptor[0];
                                     String longitude = locDescriptor[1];
                                     String trespassing = locDescriptor[2].toLowerCase(); 
                                     
-                                    // System.out.printf("****Found location: %s, %s, %s\n",latitude, longitude, trespassing);
-
                                     // instantiate a location object
                                     Location loc = new Location(latitude, longitude, trespassing, i+1); 
 
                                     // extract each character
                                     boolean doneCharacter = false;
-                                    while((!doneCharacter) && (i <  fileLines.size())) {
+                                    while ((!doneCharacter) && (i <  fileLines.size())) {
 
                                         // extract each character
                                         line =  fileLines.get(i);
                                         i++;
-
-                                        // System.out.println("Character loop line read: " + line);
-
                                         try {
                                             String[] sp5 = line.split(",",-1);
                                             if(sp5.length != 8) {
@@ -146,10 +221,9 @@ public class FileManager {
                                             }
                                             String[] sp6 = sp5[0].split(":",-1);     
                                                                                 
-                                            if((sp6[0].equals("human")) || (sp6[0].equals("animal"))) {    
-                                                
+                                            if ((sp6[0].equals("human")) || (sp6[0].equals("animal"))) {    
                                                 int age;
-                                                try{
+                                                try {
                                                     age = Integer.parseInt(sp5[2]);
                                                 } catch (NumberFormatException e) {
                                                     System.out.println("WARNING: invalid number format in scenarios file in line " + (i+1));
@@ -163,8 +237,6 @@ public class FileManager {
                                                     case "human":
                                                         String profession = sp5[4].toLowerCase();
                                                         String pregnant = sp5[5].toLowerCase();
-                                                        // System.out.printf("******Found human: %s,%s,%s,%s,%s\n",sp5[1],sp5[2],sp5[3],sp5[4],sp5[5]);
-                                                        
                                                         // instantiate a human object
                                                         ch = new Human(gender, age, bodyType, profession, pregnant, i+1); 
                                                         break;
@@ -172,8 +244,6 @@ public class FileManager {
                                                     case "animal":
                                                         String species = sp5[6].toLowerCase();
                                                         String isPet = sp5[7].toLowerCase();
-                                                        // System.out.printf("******Found animal: %s,%s,%s,%s,%s\n",sp5[1],sp5[2],sp5[3],sp5[6],sp5[7]);
-
                                                         // instantiate an animal object
                                                         ch = new Animal(gender, age, bodyType, species, isPet, i+1); 
                                                         break;
@@ -182,65 +252,55 @@ public class FileManager {
                                                         System.out.println("Invalid character type, neither human nor animal..Aborting");
                                                         System.exit(1);
                                                 }   
-                                                loc.addCharacter(ch);
-                                                //i++;
-                                                  
-
-                                            } else{
+                                                loc.addCharacter(ch);                                                  
+                                            } else {
                                                 doneCharacter = true;
-                                                // System.out.println("\nDone with this location\n");
                                                 i--;
                                             } 
-
                                         } catch (InvalidDataFormatException e) {
                                             System.out.println(e.getMessage());
                                         }                                       
                                     }
-
                                     scen.addLocation(loc);
-                                    
-                                    // System.out.println("Number of characters in this location: " + loc.getNumCharacters());
-
                                 } else {
                                     doneLocation = true;
-                                    // System.out.println("\nDone with this scenario\n");
                                     i--;
                                 }   
-                                
-
-                            } catch(InvalidDataFormatException e) {
+                            } catch (InvalidDataFormatException e) {
                                 System.out.println(e.getMessage());
                             }
-                    
                         }
-
-                        scenarios.add(scen);
-                        // System.out.println("Number of locations in this scenario: " + scen.getNumLocations());
+                        this.fileScenarios.add(scen);
                     }                 
-
-                } catch(InvalidDataFormatException e) {
+                } catch (InvalidDataFormatException e) {
                     System.out.println(e.getMessage());
                 }
             }
-            System.out.printf("%d scenarios imported.\n", scenarios.size());
-        
+            System.out.printf("%d scenarios imported.\n", this.fileScenarios.size());
         } catch (FileNotFoundException e) {
             System.out.println("java.io.FileNotFoundException: could not find scenarios file.");
-            System.exit(1);
+            // reset the scenarios file provided flag
+            this.scenarioProvided = false;
         }
-
-
-        return scenarios;
     }
 
+    /**
+	 * Helper method for saving judged decisions to log file 
+     * 
+     * @param scenarios  object containing data for all scenarios
+     * @param initScenario  first judged scenario    
+     * @param finalScenario  last judged scenario    
+     * @param decisions  scenario judging decisions (i.e. location number for the group that will be saved by RescueBot)
+     * @param decisionMaker  who made the decisions, i.e. user or algorithm
+	 */
     public void saveToLogFile(ArrayList<Scenario> scenarios, int initScenario, int finalScenario, int[] decisions, String decisionMaker) {
 
         // open file stream and save the scenarios
-        try{
+        try {
             PrintWriter outStream = new PrintWriter(new FileOutputStream(this.logFile, true));         
 
             // save all relevant information pertaining to each scenario
-            for(int s = initScenario; s < finalScenario; s++) {
+            for (int s = initScenario; s < finalScenario; s++) {
                 Scenario sc = scenarios.get(s);
                 outStream.println("# Scenario: " + sc.getDescriptor());
                 ArrayList<Location> locations = sc.getLocations();
@@ -268,7 +328,7 @@ public class FileManager {
 
                 // save user decisions if user has consented
                 if (decisionMaker.equals("USER")) {
-                    if(this.userConsented) {
+                    if (this.userConsented) {
                         outStream.println("** USER Decision Location Number: " + (decisions[s]+1));
                     } else {
                         outStream.println("** USER Decision Location Number: noConsent");
@@ -276,9 +336,7 @@ public class FileManager {
                 } else {
                     outStream.println("** ALGORITHM Decision Location Number: " + (decisions[s]+1));
                 }
-                
             } 
-   
             // close file output stream
             outStream.close();
 
@@ -288,10 +346,15 @@ public class FileManager {
         }
     }
 
+    /**
+	 * Helper method for importing data from log file 
+     * 
+     * @throws Exception  exception thrown in case of file not found or file empty
+     * @return  data imported from log file
+	 */
     public ArrayList<String> importLogFile() throws Exception{
 
         // read and return all lines from the logfile
-        // open and read from scenario file
         Scanner inStream = null;
         ArrayList<String> fileLines = null;
         
@@ -303,44 +366,15 @@ public class FileManager {
             throw new Exception();
         }
         
-        fileLines = new ArrayList<String>(0);
-
         // read all the lines from the file
-        //int j = 1;
-        while(inStream.hasNextLine()) {
+        fileLines = new ArrayList<String>(0);
+        while (inStream.hasNextLine()) {
             fileLines.add(inStream.nextLine());
-            //System.out.printf("Line %d: %s \n",j,fileLines.get(fileLines.size()-1));
-            //j++;
         }
         // close file input stream
         inStream.close();
 
-        //System.out.println("Done reading from log file!");
         return fileLines;
-
     }
-
-    private boolean isValidFileName(String filename, String type) {
-        boolean valid = false; 
-        String[] sp = filename.split("\\.");
-        for(String s: sp) {
-            System.out.println(s);
-        }
-        if(sp.length > 1) {
-            if(sp[1].equals(type)) {
-                valid = true;
-            }
-        }
-        return valid;
-    }
-
-    public static void main(String[] args) {
-
-        // testing
-        //FileManager f = new FileManager();
-        //ArrayList<Scenario> sc = f.importScenarios("scenarios.csv");
-
-    }
-
 
 }

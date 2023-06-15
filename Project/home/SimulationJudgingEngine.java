@@ -4,9 +4,22 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * A class implementating an algorithm-based judging engine.
+ *
+ * @author: Tanzid Sultan
+ * ID# 1430660, Email: tanzids@student.unimelb.edu.au
+ */
 public class SimulationJudgingEngine implements JudgingEngine {
 
+    /**
+     * constants
+     */
+    public static final String DECISION_MAKER = "ALGORITHM";
 
+    /**
+    *  instance variables 
+    */
     private ArrayList <Scenario> scenarios;
     private int[] simulationDecisions;
     private Scanner kb;
@@ -14,9 +27,12 @@ public class SimulationJudgingEngine implements JudgingEngine {
     private FileManager fManager;
     private RandomScenarioGenerator rsGenerator;
 
-    public static final String DECISION_MAKER = "ALGORITHM";
-
-
+     /**
+	 *  Class Constructor
+     *
+	 * @param kb  Scanner object for reading keyboard input stream
+	 * @param fManager  File manager object
+	 */
     public SimulationJudgingEngine(Scanner kb, FileManager fManager) {
         this.scenarios = null;
         this.kb = kb;
@@ -28,43 +44,57 @@ public class SimulationJudgingEngine implements JudgingEngine {
 
     }
 
+    /**
+    * Helper method for acquiring scenarios (either from file or randomly generated)
+    */
     public void loadScenarios() {
 
         // import scenarios from file (if option provided), otrherwise generate randomly
-        if(this.fManager.getScenarioProvided()){
-            //System.out.println("Importing scenarios file: " + rb.scenarioFile);
-            scenarios = this.fManager.importScenarios();
+        if (this.fManager.getScenarioProvided()) {
+            scenarios = this.fManager.getFileScenarios();
         } 
             
     }
 
+    /**
+	 * Accessor method for retrieving scenarios data.
+     * 
+     * @return a copy of the array list containing scenarios
+	 */
     public ArrayList<Scenario> getScenarios() {
         // return a deep copy of the scenarios array list
         ArrayList<Scenario> scenariosCopy = new ArrayList<Scenario>(0);
-        for(Scenario sc: this.scenarios){
+        for (Scenario sc: this.scenarios) {
             scenariosCopy.add(new Scenario(sc));
         }
         return scenariosCopy;
     }
 
+    /**
+	 * Accessor method for retrieving user decisions.
+     * 
+     * @return a copy of the array containing user decisions for judged scenarios
+	 */    
     public int[] getSimulationDecisions() {
         // return a deep copy of the array containing user decisions  
         int[] simulationDecisionsCopy = new int[scenarios.size()];
-        for(int i = 0; i < scenarios.size(); i++) {
+        for (int i = 0; i < scenarios.size(); i++) {
             simulationDecisionsCopy[i] = this.simulationDecisions[i];
         }
         return simulationDecisionsCopy;
     }
 
+    /**
+    * Helper method for judging given scenarios
+    */    
     public void judgeScenarios() {
-        //System.out.println("Simulation judging in progress...");  
 
         if (!this.fManager.getScenarioProvided()) {
             // prompt user for number of scenarios
             boolean done = false;
             int N = 0;
             System.out.println("How many scenarios should be run?");
-            while(!done) {
+            while (!done) {
                 System.out.print("> ");
                 try {
                     N = Integer.parseInt(kb.next());
@@ -87,7 +117,7 @@ public class SimulationJudgingEngine implements JudgingEngine {
         this.storeAllCharacteristic();
 
         // judge all scenarios (get algorithm decisions)
-        for(int i = 0; i < this.scenarios.size(); i++) {
+        for (int i = 0; i < this.scenarios.size(); i++) {
             this.simulationDecisions[i] = this.decide(scenarios.get(i));
         } 
         
@@ -107,16 +137,21 @@ public class SimulationJudgingEngine implements JudgingEngine {
         this.kb.nextLine();
     }
 
-    // simulation algorithm decides on which location to save
-    public int decide(Scenario sc) {
 
-        //System.out.println("======================================");
-        //System.out.println("# Scenario: " + sc.getDescriptor());
-        //System.out.println("======================================");
+    /**
+    * Decision algorithm for choosing which group to save within the given scenario.
+    * This algorithm first computes a "decision score" for each location using the characteristics of 
+    * its inhabitants. Different characteristics are assigned different weights which contribute
+    * to the overall score. Then the algorithm makes a decision by choosing the location which
+    * has the highest decision score.
+    *
+    * @param sc  the scenario
+    * @return  which group location to save
+    */    
+    public int decide(Scenario sc) {
 
         // show each location
         ArrayList<Location> locations = sc.getLocations();
-        //System.out.println("Number of locations: " +locations.size());
 
         // a "decision score" will be computed for each location
         // the location with the highest score will get chosen to be saved
@@ -125,22 +160,18 @@ public class SimulationJudgingEngine implements JudgingEngine {
         // compute decision scores for each location 
         for (int i = 0; i < locations.size(); i++) {
             Location loc = locations.get(i);
-
-            //System.out.printf("[%d] Location: %s, %s\n",i, loc.getLatitude(), loc.getLongitude());
-            //System.out.println("Trespassing: " + loc.getTrespassing());
             decisionScore[i] = this.computeDecisionScore(loc);
-
-            //System.out.printf("Location: %d, Decision_Score: %.2f \n",i,decisionScore[i]);
         }
 
         // find location with largest score        
         int decision = findMax(decisionScore);
-        //System.out.println("decision: "+decision);
-
         return decision;
     }
 
-    // method for computing the decision score for a given location
+    /**
+    * Helper method for computing the decision score for a given location
+    * @return  decision score
+    */ 
     private double computeDecisionScore(Location loc) {
 
         // the following 6 characteristics are assigned weights which will contribute to the decision scores
@@ -176,7 +207,6 @@ public class SimulationJudgingEngine implements JudgingEngine {
 
         double score = 0.0;
         ArrayList<Character> characters = loc.getCharacters();
-        //System.out.printf("%d Characters:\n",characters.size());
         
         // accumulate decision score weights for each characters
         for (Character ch: characters) {
@@ -184,13 +214,12 @@ public class SimulationJudgingEngine implements JudgingEngine {
             String characteristics = ch.toString();
             String[] sp = characteristics.split(" ");
             characteristics = sp[1];
-            for(int j = 2; j < sp.length; j++) {
+            for (int j = 2; j < sp.length; j++) {
                 characteristics += " " + sp[j]; 
             }
-            //System.out.println("- " + characteristics);
 
             // check for decision characteristic 1: human or animal
-            if(sp[0].equals("human")) {
+            if (sp[0].equals("human")) {
                 score += isHumanWeight;
                 // check for decision characteristic 2: age category
                 if (sp[2].equals("baby")) {
@@ -228,7 +257,10 @@ public class SimulationJudgingEngine implements JudgingEngine {
         return score;
     }
 
-    // helper method for finding the array index corresponding to the largest array element
+    /**
+    * Helper method for finding the array index corresponding to the largest array element
+    * @return  index of the largest element
+    */ 
     private int findMax(double[] values) {
         double max = 0.0;
         int ix = 0;
@@ -241,27 +273,15 @@ public class SimulationJudgingEngine implements JudgingEngine {
         return ix;
     }
 
-    /*
-    // simulation algorithm decides on which location to save
-    public int decide(Scenario sc) {
-        // a very simple decision engine
-        // TODO: take into account at least 5 characteristics
-        
-        // 50/50
-        if(Math.random() > 0.5) {
-            return scenario.getLocation(1);
-        } else {
-            return scenario.getLocation(2);
-        }
-    }
-    */
-
+    /**
+    * Helper method for storing all relevant characteristics across characters from all judged scenarios
+    */ 
     private void storeAllCharacteristic() {
 
         this.allScenariosCharacteristics = new ArrayList<String>(0);
 
          // iterate over every scenario and location, collect characteristic from all characters
-        for(int i = 0; i < this.scenarios.size(); i++){
+        for (int i = 0; i < this.scenarios.size(); i++){
            
             Scenario sc = this.scenarios.get(i);
             
@@ -278,15 +298,15 @@ public class SimulationJudgingEngine implements JudgingEngine {
                 for (Character ch: characters) {
                     //System.out.println("- " + ch.toString());
                     String[] characteristics = ch.toString().split(" ");
-                    for(String characteristic: characteristics) {
+                    for (String characteristic: characteristics) {
                         // exclude default values (i.e none, unknown, unspecified)
-                        if((!characteristic.equals("none")) && (!characteristic.equals("unknown")) &&
-                           (!characteristic.equals("none"))){
+                        if ((!characteristic.equals("none")) && (!characteristic.equals("unknown")) &&
+                           (!characteristic.equals("unspecified"))){
                             this.allScenariosCharacteristics.add(characteristic);
                         }
                     } 
                     // also add trespassing characteristic
-                    if(loc.getTrespassing().equals("yes")) {
+                    if (loc.getTrespassing().equals("yes")) {
                         this.allScenariosCharacteristics.add("trespassing");
                     } else {
                         this.allScenariosCharacteristics.add("legal");
@@ -296,7 +316,9 @@ public class SimulationJudgingEngine implements JudgingEngine {
         }
     }
 
-     
+    /**
+    * Helper method for generating statistics for judged scenarios
+    */ 
     public void generateStatistics() {
        
         ArrayList<String> sortedCharacteristics = new ArrayList<String>(0);
@@ -313,43 +335,43 @@ public class SimulationJudgingEngine implements JudgingEngine {
 
     }
 
-    // computes the statistics for caracteristics of saved characters from all scenarios judged so far
+
+    /**
+    * Helper method for computing the statistics for caracteristics of saved characters from all scenarios judged so far
+    *
+    * @param sortedCharacteristics  array list containing relevant characteristics for which statistics will be computed
+    * @param sortedStatistics  array list containing statistic values for the relevant characteristics
+    */     
     private void computeStats(ArrayList<String> sortedCharacteristics, ArrayList<String> sortedStatistics) {
-        
         ArrayList<String> savedCharactersCharacteristics = new ArrayList<String>(0);
         Double averageAge = 0.0, totalAge = 0.0;
         int numHumans = 0;
 
         // iterate over judged scenario and locations, collect characteristics from all characters who have been saved
-        for(int i = 0; i < this.scenarios.size(); i++){
-           
+        for (int i = 0; i < this.scenarios.size(); i++){   
             Scenario sc = this.scenarios.get(i);
             Location loc = sc.getLocation(this.simulationDecisions[i]);
 
-
-            //System.out.printf("Location: %s, %s\n", loc.getLatitude(), loc.getLongitude());
-            //System.out.println("Trespassing: " + loc.getTrespassing());
             // show each character
             ArrayList<Character> characters = loc.getCharacters();
             //System.out.printf("%d Characters:\n",characters.size());
             for (Character ch: characters) {
-                //System.out.println("- " + ch);
                 String[] characteristics = ch.toString().split(" ");
-                for(String characteristic: characteristics) {
+                for (String characteristic: characteristics) {
                     // exclude default values (i.e none, unknown, unspecified)
-                    if((!characteristic.equals("none")) && (!characteristic.equals("unknown")) &&
+                    if ((!characteristic.equals("none")) && (!characteristic.equals("unknown")) &&
                         (!characteristic.equals("none"))){
                         savedCharactersCharacteristics.add(characteristic);
                     }
                 } 
                 // also add trespassing characteristic
-                if(loc.getTrespassing().equals("yes")) {
+                if (loc.getTrespassing().equals("yes")) {
                     savedCharactersCharacteristics.add("trespassing");
                 } else {
                     savedCharactersCharacteristics.add("legal");
                 }
                 // keep track of human age total and count
-                if(characteristics[0].equals("human")) {
+                if (characteristics[0].equals("human")) {
                     numHumans++;
                     totalAge += ch.getAge();
                 }
@@ -363,33 +385,34 @@ public class SimulationJudgingEngine implements JudgingEngine {
         Set<String> distinctCharacteristics = new HashSet<String>(this.allScenariosCharacteristics);
 
         // compute frequency counts and statistic of each distinct characteristic across the saved characters and all characters 
-        //System.out.println("------------------------");
-        //System.out.println("Characteristic Counts: ");
-        for(String c: distinctCharacteristics) {
+        for (String c: distinctCharacteristics) {
             int countSavedCharacters = Collections.frequency(savedCharactersCharacteristics, c);
             int countAllCharacters = Collections.frequency(this.allScenariosCharacteristics, c);
-            double stat = (double) countSavedCharacters / (double) countAllCharacters; 
-            //System.out.printf("Charcteristic: %s, Saved count: %d, All count: %d, Statistic: %.2f \n", c, countSavedCharacters, countAllCharacters, stat);
+            // compute the statistic value (round up the last digit)
+            double stat = Math.ceil(100 * (double) countSavedCharacters / (double) countAllCharacters)/100; 
             sortedCharacteristics.add(c);
             sortedStatistics.add(String.format("%.2f",stat));
         }
-
         // compute average age and add it to statistics arraylist
         averageAge = totalAge/numHumans;
         sortedStatistics.add(String.format("%.2f",averageAge));
-
     }
 
-    // performs selection sort on a collection of statistic values
+    /**
+    * Helper method for performing selection sort on a given collection of statistic values
+    *
+    * @param sortedCharacteristics  array list containing relevant characteristics for which statistics have been computed
+    * @param sortedStatistics  array list containing statistic values for the relevant characteristics
+    */     
     private void sortStats(ArrayList<String> sortedCharacteristics, ArrayList<String> sortedStatistics) {
 
         // perform selection sort of statistic values in decreasing order
-        for(int i = 0; i < sortedCharacteristics.size(); i++){
+        for (int i = 0; i < sortedCharacteristics.size(); i++) {
             int largestSoFar = i;
-            for(int j = i+1; j < sortedCharacteristics.size(); j++) {
+            for (int j = i+1; j < sortedCharacteristics.size(); j++) {
                 Double n1 = Double.parseDouble(sortedStatistics.get(largestSoFar));
                 Double n2 = Double.parseDouble(sortedStatistics.get(j));
-                if(n1.compareTo(n2) < 0) {
+                if (n1.compareTo(n2) < 0) {
                     largestSoFar = j;
                 } else if (n1.compareTo(n2) == 0) {
                     // resolve ties by sorting in alphabetical order
@@ -398,7 +421,7 @@ public class SimulationJudgingEngine implements JudgingEngine {
                     }
                 }
             }
-            if(largestSoFar != i) {
+            if (largestSoFar != i) {
                 String tempStat = sortedStatistics.get(i);
                 String tempChar = sortedCharacteristics.get(i);
                 sortedStatistics.set(i, sortedStatistics.get(largestSoFar));
@@ -409,14 +432,19 @@ public class SimulationJudgingEngine implements JudgingEngine {
         }
     }
     
+    /**
+    * Helper method for displaying statistics for the judged scenarios to the screen
+    *
+    * @param sortedCharacteristics  array list containing relevant characteristics for which statistics have been computed
+    * @param sortedStatistics  array list containing statistic values for the relevant characteristics
+    */ 
     private void displayStatistics(ArrayList<String> sortedCharacteristics, ArrayList<String> sortedStatistics) {
-
         System.out.println("======================================");
         System.out.println("# Statistic");
         System.out.println("======================================");     
         System.out.printf("- %% SAVED AFTER %d RUNS\n",this.scenarios.size());
         int i = 0;
-        for(i = 0; i < sortedCharacteristics.size(); i++){
+        for (i = 0; i < sortedCharacteristics.size(); i++) {
             System.out.printf("%s: %s\n", sortedCharacteristics.get(i), sortedStatistics.get(i));
         }
         System.out.printf("--\naverage age: %s\n",sortedStatistics.get(i));

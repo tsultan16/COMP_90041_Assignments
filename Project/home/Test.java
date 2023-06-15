@@ -47,6 +47,11 @@ public class Test {
 
         System.out.println(s1.compareTo(s2));
 
+        double dnum = Math.ceil(100 * (double) 3/ (double) 9)/100;
+        System.out.println(dnum);
+        String snum = String.format("%.2f", dnum); 
+        System.out.println(snum);
+
 
     }
 
