@@ -4,24 +4,32 @@ import java.util.Random;
 /**
  * A derived class for generating random scenarios.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class RandomScenarioGenerator {
 
-   /**
-     * constants
-     */    public static final long RNG_SEED = 12345;
-    public static final int NUM_SCENARIOS = 7;
+    /* random number generator seed */  
+    public static final long RNG_SEED = 12345;
+    /* default number of scenarios constant */  
+    public static final int DEFAULT_NUM_SCENARIOS = 3;
+    /* minimum number of locations constant */  
     public static final int MIN_NUM_LOCATIONS = 2;
+    /* maximum number of locations constant */  
     public static final int MAX_NUM_LOCATIONS = 5;
+    /* minimum number of characters constant */  
     public static final int MIN_NUM_CHARACTERS = 1;
+    /* maximum number of characters constant */  
     public static final int MAX_NUM_CHARACTERS = 8;
-
+    /* possible scenario descriptions constant */  
     public static final String[] SCENARIO_DESCRIPTORS = {"cyclone", "flood", "bushfire", "earthquake", "blizzard"};
+    /* possible genders constant */  
     public static final String[] GENDERS = {"male", "female"};
+    /* possible bodytypes descriptions constant */  
     public static final String[] BODYTYPES = {"average", "athletic", "overweight"};
+    /* possible professions constant */  
     public static final String[] PROFESSIONS = {"doctor", "ceo", "criminal", "homeless", "none", "student", "unemployed", "scientist"};
+    /* possible animal species constant */  
     public static final String[] SPECIES = {"cat", "ferret", "dog", "koala", "kangaroo", "wolf", "platypus", "snake", "possum", "dingo", "bear", "wallaby", "cockatoo", "orangutan", "boar", "panda"};
 
     /**
@@ -49,7 +57,7 @@ public class RandomScenarioGenerator {
         //System.out.println("Generating random scenarios...");
 
         // generate scenarios
-        for(int s = 0; s < NUM_SCENARIOS; s++) {
+        for(int s = 0; s < DEFAULT_NUM_SCENARIOS; s++) {
 
             // generate a random scenario descriptor
             int id = rng.nextInt(SCENARIO_DESCRIPTORS.length); 
@@ -170,8 +178,9 @@ public class RandomScenarioGenerator {
     }
 
      /**
-	 * @Overload Helper method for generating specified number of random scenarios.
+	 * Overloaded helper method for generating specified number of random scenarios.
      * 
+     * @param  N number of scenarios to generate
      * @return  the array list containing the generated scenarios
 	 */
     public ArrayList<Scenario> generateScenarios(int N) {

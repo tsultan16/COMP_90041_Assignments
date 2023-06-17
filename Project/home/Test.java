@@ -8,6 +8,10 @@ import java.util.Collections;
 
 public class Test {
 
+    
+    /** 
+     * @param args
+     */
     public static void main(String[] args) {
        ArrayList<String> items = new ArrayList<String>(Arrays.asList("human", "pet", "adult", "human", "cat", "doctor", "pregnant", "cat", "human", "adult"));
 

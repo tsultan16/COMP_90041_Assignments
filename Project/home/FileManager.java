@@ -10,14 +10,12 @@ import java.io.File;
  * A class for managing all file IO tasks, such as reading from scenario file and
  * reading/writing into log file.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class FileManager {
 
-    /**
-     * constants
-     */
+    /* default log file constant */  
     public static final String DEFAULT_LOGFILE = "rescuebot.log";
 
     /**
@@ -90,7 +88,8 @@ public class FileManager {
 	 */
     public void setLogFile(String filename) {
         this.logFile = filename;
-        // setting logProvided flag tells us that the user has provided a file (in case the user file has the same name as the default filename, this flag will distinguish this case)
+        // setting logProvided flag tells us that the user has provided a file (in case the user file has the 
+        // same name as the default filename, this flag will distinguish this case)
         this.logProvided = true;
     }
 
@@ -103,7 +102,7 @@ public class FileManager {
         return this.scenarioFile;
     }
 
-     /**
+    /**
 	 * Accessor method 
      * 
      * @return  whether valid scenarios file path has been provided by user
@@ -111,6 +110,16 @@ public class FileManager {
     public boolean getScenarioProvided() {
         return this.scenarioProvided;
     }
+
+    /**
+	 * Accessor method 
+     * 
+     * @return  whether consent has been provided by user
+	 */
+    public boolean getUserConsented() {
+        return this.userConsented;
+    }
+
 
     /**
 	 * Helper method for prompting user's consent for saving decisions to log file 
@@ -135,6 +144,25 @@ public class FileManager {
         if (userInput.equals("yes")) {
             this.userConsented = true;
         } 
+    }
+
+
+    /**
+	 * Helper method for reading welcome message from file and displaying to the screen.
+	 */
+    public void welcomeMsg() {
+        // read welcome message from file and display to screen
+        Scanner inStream = null;
+        try {
+            inStream = new Scanner(new FileInputStream("welcome.ascii"));
+            while (inStream.hasNextLine()) {
+                System.out.println(inStream.nextLine());    
+            }
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Welcome message file not found! Aborting.");
+            System.exit(1);
+        }
     }
 
     /**
@@ -290,27 +318,28 @@ public class FileManager {
      * @param scenarios  object containing data for all scenarios
      * @param initScenario  first judged scenario    
      * @param finalScenario  last judged scenario    
-     * @param decisions  scenario judging decisions (i.e. location number for the group that will be saved by RescueBot)
+     * @param decisions  scenario judging decisions (i.e. location number for the group that will be saved by RescueBot for each judged scenario)
      * @param decisionMaker  who made the decisions, i.e. user or algorithm
 	 */
-    public void saveToLogFile(ArrayList<Scenario> scenarios, int initScenario, int finalScenario, int[] decisions, String decisionMaker) {
+    public void saveToLogFile(ArrayList<Scenario> scenarios, int initScenario, int finalScenario, ArrayList<Integer> decisions, String decisionMaker) {
 
         // open file stream and save the scenarios
         try {
             PrintWriter outStream = new PrintWriter(new FileOutputStream(this.logFile, true));         
 
-            // save all relevant information pertaining to each scenario
+            // store all relevant information pertaining to each scenario
             for (int s = initScenario; s < finalScenario; s++) {
                 Scenario sc = scenarios.get(s);
                 outStream.println("# Scenario: " + sc.getDescriptor());
                 ArrayList<Location> locations = sc.getLocations();
                 outStream.println(locations.size() +" locations");
+                // store data for each location
                 for (int i = 1; i <= locations.size(); i++) {
                     Location loc = locations.get(i-1);
                     outStream.printf("[%d] Location: %s, %s\n",i, loc.getLatitude(), loc.getLongitude());
                     outStream.println("Trespassing: " + loc.getTrespassing());
                     int numHumans = 0, numAnimals = 0, totalHumanAge = 0;
-                    // show each character
+                    //  store data for each character
                     ArrayList<Character> characters = loc.getCharacters();
                     outStream.printf("%d characters\n",characters.size());
                     for (Character ch: characters) {
@@ -326,15 +355,13 @@ public class FileManager {
                     outStream.println("Humans: " + numHumans + " TotalHumanAge: " +  totalHumanAge + " Animals: " + numAnimals);
                 }
 
-                // save user decisions if user has consented
+                // save judging decision for the scenario 
                 if (decisionMaker.equals("USER")) {
-                    if (this.userConsented) {
-                        outStream.println("** USER Decision Location Number: " + (decisions[s]+1));
-                    } else {
-                        outStream.println("** USER Decision Location Number: noConsent");
-                    }
+                    // if user made the decision
+                    outStream.println("** USER Decision Location Number: " + (decisions.get(s)+1));
                 } else {
-                    outStream.println("** ALGORITHM Decision Location Number: " + (decisions[s]+1));
+                    // if algorithm made the decision
+                    outStream.println("** ALGORITHM Decision Location Number: " + (decisions.get(s)+1));
                 }
             } 
             // close file output stream
@@ -344,6 +371,7 @@ public class FileManager {
             System.out.println("ERROR: could not print results. Target directory does not exist.");
             System.exit(1);
         }
+        
     }
 
     /**

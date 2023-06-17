@@ -1,16 +1,16 @@
 /**
- * A class for representing character objects.
+ * A base class for representing character objects.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Character {
 
-    /**
-    *  constants 
-    */  
+    /* default gender constant */  
     public static final String DEFAULT_GENDER = "unknown";
+    /* default age constant */  
     public static final int DEFAULT_AGE = 15;
+    /* default body type constant */  
     public static final String DEFAULT_BODYTYPE = "unspecified";
 
     /**
@@ -36,7 +36,7 @@ public class Character {
     }
 
    /**
-	*  @Overload Class constructor without exception handling
+	*  Overloaded class constructor without exception handling
     *
     * @param gender  character's gender
     * @param age  character's age
@@ -49,7 +49,7 @@ public class Character {
     }
 
     /**
-	*  @Overload Class copy constructor 
+	*  Overloaded class copy constructor 
     *
     * @param other  the character object to be copied 
 	*/     
@@ -68,14 +68,14 @@ public class Character {
     private String validGender(String gender, int lineNum) {
         String valid;    
         try {
-            if ((gender.equals("male")) || (gender.equals("female"))) {
+            if ((gender.equals("male")) || (gender.equals("female")) || (gender.equals(DEFAULT_GENDER))) {
                 valid = gender;
             } else {
                 throw new InvalidCharacteristicException("WARNING: invalid characteristic in scenarios file in line " + lineNum);
             }
         } catch (InvalidCharacteristicException e) {
             System.out.println(e.getMessage());
-            valid= DEFAULT_GENDER;
+            valid = DEFAULT_GENDER;
         }
         return valid;
     }

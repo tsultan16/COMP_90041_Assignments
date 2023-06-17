@@ -1,14 +1,12 @@
 /**
  * A derived class for representing human character objects.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Human extends Character {
 
-    /**
-    *  constants 
-    */  
+    /* default profession constant */  
     public static final String DEFAULT_PROFESSION = "none";
 
     /**
@@ -33,24 +31,21 @@ public class Human extends Character {
         this.ageCategory = this.categorizeAge(this.getAge());
         
         // check that only adults have non-default professions
+        // (if age category is non-adult and if profession is not none, throw invalid characteristic expception)
         if (!this.ageCategory.equals("adult")){
             // default profession for non-adults
-            try {
-                if (!profession.equals(DEFAULT_PROFESSION)) {
-                     throw new InvalidCharacteristicException("WARNING: invalid characteristic in scenarios file in line " + lineNum);
-                } else {            
-                    this.profession = profession;
-                }
-            } catch (InvalidCharacteristicException e) {
-                System.out.println(e.getMessage());
+            if (!profession.equals(DEFAULT_PROFESSION)) {
                 this.profession = DEFAULT_PROFESSION;
+            } else {            
+                this.profession = profession;
             }
         } else {
-            this.profession = profession; //this.validProfession(profession, lineNum);
+            this.profession = profession; 
         }
         
-        // check that only adult females are pregnant
-        if (this.getGender().equals("male")) {
+        // check that only adult females are pregnant 
+        // (if gender is non-female/non-adult female and if pregnant is true, throw invalid characteristic expception)
+        if (!this.getGender().equals("female")) {
             try {
                 if (pregnant.equals("true")) {
                     throw new InvalidCharacteristicException("WARNING: invalid characteristic in scenarios file in line " + lineNum);
@@ -81,7 +76,7 @@ public class Human extends Character {
     }
 
    /**
-	*  @Overload Class constructor without exception handling
+	*  Overloaded class constructor without exception handling
     *
     * @param gender  character's gender
     * @param age  character's age
@@ -97,7 +92,7 @@ public class Human extends Character {
     }
 
     /**
-	*  @Overload Class copy constructor 
+	*  Overloaded class copy constructor 
     *
     * @param other  the Human object to be copied 
 	*/         
@@ -134,7 +129,7 @@ public class Human extends Character {
     public boolean getPregnant() {
         return this.pregnant;
     }
-
+    
     /**
 	 * Helper method for determining the age category based on character's age.
      * 
@@ -156,7 +151,7 @@ public class Human extends Character {
     }
  
     /**
-	 * @Override 
+	 * Overridden toString method 
      * 
      * @return  string containing all relevant information about the Human object
 	 */

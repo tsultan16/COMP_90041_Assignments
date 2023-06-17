@@ -3,15 +3,14 @@ import java.util.ArrayList;
 /**
  * A class for representing location objects.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Location {
 
-    /**
-    *  constants 
-    */  
+    /* default latitude constant */  
     public static final String DEFAULT_LATITUDE = "10.0000 N";
+    /* default longitude constant */  
     public static final String DEFAULT_LONGITUDE = "10.0000 E";
 
     /**
@@ -27,7 +26,7 @@ public class Location {
     *
     * @param latitude  location latitude
     * @param longitude  location longitude
-    * @param longitude  tp trespaaing status 
+    * @param tp trespassing status 
     * @param lineNum line number from scenarios file where the location was extracted from 
 	*/   
     public Location(String latitude, String longitude, String tp, int lineNum){
@@ -43,11 +42,11 @@ public class Location {
     }
 
     /**
-	*  @Overload Class constructor without exception handling
+	* Overloaded class constructor without exception handling
     *
     * @param latitude  location latitude
     * @param longitude  location longitude
-    * @param longitude  tp trespaaing status 
+    * @param tp trespassing status 
 	*/       
     public Location(String latitude, String longitude, String tp){
         this.latitude = latitude;
@@ -61,7 +60,7 @@ public class Location {
     }
 
     /**
-	*  @Overload Class copy constructor 
+	*  Overloaded class copy constructor 
     *
     * @param other  the location object to be copied 
 	*/ 

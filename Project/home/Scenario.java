@@ -3,7 +3,7 @@ import java.util.ArrayList;
 /**
  * A class for representing scenario objects.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Scenario {
@@ -25,7 +25,7 @@ public class Scenario {
     }
 
     /**
-	* @Overload Class copy constructor
+	* Overloaded class copy constructor
     *
     * @param other  scenario object to be copied
 	*/     
@@ -78,6 +78,7 @@ public class Scenario {
      /**
 	 * Accessor method for obtaining a specified location within the scenario 
 	 *
+	 * @param locationNumber  array index for the specified location object
      * @return location object
 	 */
     public Location getLocation (int locationNumber) {

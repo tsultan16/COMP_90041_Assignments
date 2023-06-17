@@ -1,7 +1,7 @@
 /**
  * A derived class for representing animal character objects.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Animal extends Character {
@@ -31,7 +31,7 @@ public class Animal extends Character {
                 this.isPet = ip;
             } else {
                 if (ip) {
-                    // any species other than cat, dog or ferret cannot be pet'
+                    // any species other than cat, dog or ferret cannot be pet and throws invalid characteristic exception
                     throw new InvalidCharacteristicException("WARNING: invalid characteristic in scenarios file in line " + lineNum);
                 } else {
                     this.isPet = ip;
@@ -45,7 +45,7 @@ public class Animal extends Character {
     }
 
     /**
-	*  @Overload Class constructor without exception handling
+	*  Overloaded class constructor without exception handling
     *
     * @param gender  character's gender
     * @param age  character's age
@@ -60,7 +60,7 @@ public class Animal extends Character {
     }
 
     /**
-	*  @Overload Class copy constructor 
+	*  Overloaded class copy constructor 
     *
     * @param other  the Animal object to be copied 
 	*/          
@@ -90,7 +90,7 @@ public class Animal extends Character {
 
 
     /**
-	 * @Override 
+	 * Overridden toString method
      * 
      * @return  string containing all relevant information about the Animal object
 	 */    

@@ -7,7 +7,7 @@ import java.util.HashSet;
 /**
  * A class for auditing decision history obtained from log file.
  *
- * @author: Tanzid Sultan
+ * @author Tanzid Sultan
  * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Auditor {
@@ -76,12 +76,10 @@ public class Auditor {
         try {
             logFileData = this.fManager.importLogFile();
             
-            // parse the log file data
-            //System.out.println("Parsing log file containing " + logFileData.size() + " lines");
+            // parse the log file and extract auditing data
             this.parseData(logFileData);
 
-            // compute and display statistics
-            //System.out.println("Computing global statistics");
+            // compute and display audit statistics
             this.computeStats();
             
             System.out.println("That's all. Press Enter to return to main menu.");
@@ -98,7 +96,10 @@ public class Auditor {
     }
 
     /**
-    * Helper method for parsing the log file data
+    * Helper method for parsing the log file data and extracting all relevant characteristics needed for the audit.
+    * Note: Each scenario read from the log file is also accompanied by information about who made the judging 
+    * decision, which can be either user or algorithm. Scenarios judged by user will further indicate whether
+    * user provided consent for decision to be logged. 
     * @param data  log file data array
     */
     private void parseData(ArrayList<String> data) {
@@ -117,21 +118,18 @@ public class Auditor {
         while (i < data.size()) {
             // read each scenario
             String[] sp = data.get(i).split(" ");
-            
             // get number of locations
             i++; 
             sp = data.get(i).split(" ");
             int numLocs = Integer.parseInt(sp[0]);
             i++;
             ArrayList<ArrayList<String>> scenarioCharacteristics = new ArrayList<ArrayList<String>>(numLocs);
-
             int[] humansSaved = new int[numLocs];
             int[] humansSavedTotalAge = new int[numLocs];
 
             // read characters from each location
             for (int j = 0; j < numLocs; j++) {
                 ArrayList<String> locationCharacteristics = new ArrayList<String>(0); 
-
                 // read trespassing status
                 i++;
                 String trespassing = "";
@@ -150,11 +148,10 @@ public class Auditor {
 
                 // read each character
                 for (int k = 0; k < numChars; k++) {
-                    //System.out.println(data.get(i));
                     sp = data.get(i).split(" ");
                     // accumulate all characteristics from this character
                     locationCharacteristics.add(trespassing);
-                    for(int c = 1; c < sp.length; c++) {
+                    for(int c = 2; c < sp.length; c++) {
                         locationCharacteristics.add(sp[c]);
                     }
                     i++;
@@ -178,24 +175,21 @@ public class Auditor {
             String decisionMaker = sp[1];
             // user made the decision
             if (decisionMaker.equals("USER")) {
-                // ckeck if user consented
-                if (!sp[5].equals("noConsent")) {
-                    // get user decision
-                    int decision = Integer.parseInt(sp[5])-1;
-                    // collect characteristics
-                    for (int j = 0; j < scenarioCharacteristics.size(); j++) {
-                        ArrayList<String> sc = scenarioCharacteristics.get(j);
-                        for (String characteristic: sc) {
-                            this.allUserCharacteristics.add(characteristic);
-                            if (decision == j) {
-                                this.savedUserCharacteristics.add(characteristic);
-                            }
+                // get user decision
+                int decision = Integer.parseInt(sp[5])-1;
+                // collect characteristics
+                for (int j = 0; j < scenarioCharacteristics.size(); j++) {
+                    ArrayList<String> sc = scenarioCharacteristics.get(j);
+                    for (String characteristic: sc) {
+                        this.allUserCharacteristics.add(characteristic);
+                        if (decision == j) {
+                            this.savedUserCharacteristics.add(characteristic);
                         }
                     }
-                    this.humansSavedTotalUser += humansSaved[decision];
-                    this.humansSavedTotalAgeUser += humansSavedTotalAge[decision];
-                    this.userRuns++;
-                } 
+                }
+                this.humansSavedTotalUser += humansSaved[decision];
+                this.humansSavedTotalAgeUser += humansSavedTotalAge[decision];
+                this.userRuns++; 
 
             // algorithm made the decision    
             } else {
@@ -283,14 +277,13 @@ public class Auditor {
         for (String c: distinctChars) {
             int countSavedCharacters = Collections.frequency(savedChars, c);
             int countAllCharacters = Collections.frequency(allChars, c);
-            double stat = (double) countSavedCharacters / (double) countAllCharacters; 
-            //System.out.printf("Charcteristic: %s, Saved count: %d, All count: %d, Statistic: %.2f \n", c, countSavedCharacters, countAllCharacters, stat);
+            // compute the statistic value (round up the last digit)
+            double stat = Math.ceil(100 * (double) countSavedCharacters / (double) countAllCharacters)/100; 
             sortedChars.add(c);
             sortedStats.add(String.format("%.2f",stat));
         }
         // sort the statistics
         this.sortStats(sortedChars, sortedStats);
-
     }
 
 
