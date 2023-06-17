@@ -2,7 +2,6 @@
  * A derived class for representing animal character objects.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Animal extends Character {
 

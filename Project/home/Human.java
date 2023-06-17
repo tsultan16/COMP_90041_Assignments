@@ -2,7 +2,6 @@
  * A derived class for representing human character objects.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Human extends Character {
 

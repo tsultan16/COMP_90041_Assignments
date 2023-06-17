@@ -2,7 +2,6 @@
  * A derived class for invalid input exceptions.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class InvalidInputException extends Exception {
 

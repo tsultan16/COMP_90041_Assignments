@@ -1,8 +1,6 @@
 /**
  * COMP90041, Sem1, 2023: Final Project
  * @author Tanzid Sultan
- * student id: 1430660
- * student email: tanzids@student.unimelb.edu.au
  */
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -20,7 +18,6 @@ import java.util.ArrayList;
  * generator, a statictics generator and an auditor for analyzing decision  *history data.  
  * 
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class RescueBot {
 

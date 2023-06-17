@@ -8,7 +8,6 @@ import java.util.Set;
  * from judged scenarios.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class StatisticsGenerator {
 

@@ -5,7 +5,6 @@ import java.util.Random;
  * A derived class for generating random scenarios.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class RandomScenarioGenerator {
 

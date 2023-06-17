@@ -11,7 +11,6 @@ import java.io.File;
  * reading/writing into log file.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class FileManager {
 

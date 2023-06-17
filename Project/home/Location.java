@@ -4,7 +4,6 @@ import java.util.ArrayList;
  * A class for representing location objects.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Location {
 

@@ -8,7 +8,6 @@ import java.util.HashSet;
  * A class for auditing decision history obtained from log file.
  *
  * @author Tanzid Sultan
- * ID# 1430660, Email: tanzids@student.unimelb.edu.au
  */
 public class Auditor {
 
